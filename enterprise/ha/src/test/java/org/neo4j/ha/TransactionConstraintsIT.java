@@ -213,8 +213,7 @@ public class TransactionConstraintsIT extends AbstractClusterTest
         deleteNode( cluster.getMaster(), node.getId() );
 
         // WHEN
-        Transaction tx = aSlave.beginTx();
-        try
+        try ( Transaction ignored = aSlave.beginTx() )
         {
             node.setProperty( "name", "test" );
             fail( "Shouldn't be able to modify a node deleted on master" );
@@ -223,10 +222,6 @@ public class TransactionConstraintsIT extends AbstractClusterTest
         {
             // THEN
             // -- the transactions gotten back in the response should delete that node
-        }
-        finally
-        {
-            tx.finish();
         }
     }
     

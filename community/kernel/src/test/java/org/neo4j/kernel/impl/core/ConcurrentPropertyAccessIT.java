@@ -19,12 +19,6 @@
  */
 package org.neo4j.kernel.impl.core;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Thread.interrupted;
-import static java.lang.Thread.sleep;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static org.neo4j.test.TargetDirectory.forTest;
-
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
@@ -32,11 +26,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.helpers.Pair;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Thread.interrupted;
+import static java.lang.Thread.sleep;
+import static java.util.concurrent.Executors.newCachedThreadPool;
+
+import static org.neo4j.test.TargetDirectory.forTest;
 
 @Ignore( "Good for driving out problems with loading/heaviness of property records" )
 public class ConcurrentPropertyAccessIT
@@ -110,21 +112,17 @@ public class ConcurrentPropertyAccessIT
         {
             while ( true )
             {
-                Transaction tx = db.beginTx();
-                try
+                try ( Transaction tx = db.beginTx() )
                 {
                     doSomething();
                     tx.success();
                 }
                 catch ( Throwable t )
                 {
-                    t.printStackTrace(System.err);
+                    t.printStackTrace( System.err );
                     System.err.flush();
                     // throw Exceptions.launderedException( t );
-                }
-                finally
-                {
-                    tx.finish();
+
                 }
             }
         }

@@ -252,8 +252,7 @@ public class TxPushStrategyConfigIT
 
     private void createTransaction( GraphDatabaseAPI db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.createNode();
             tx.success();
@@ -262,10 +261,6 @@ public class TxPushStrategyConfigIT
         {
             e.printStackTrace();
             throw e;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

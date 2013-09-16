@@ -42,9 +42,11 @@ import org.neo4j.kernel.impl.transaction.xaframework.XaDataSource;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import static org.neo4j.kernel.impl.transaction.xaframework.LogExtractor.newLogReaderBuffer;
 import static org.neo4j.kernel.impl.transaction.xaframework.LogIoUtils.readLogHeader;
 
@@ -88,8 +90,7 @@ public class TestIndexCreation
                     @Override
                     public void run()
                     {
-                        Transaction tx = db.beginTx();
-                        try
+                        try ( Transaction tx = db.beginTx() )
                         {
                             latch.await();
                             Index<Node> index = db.index().forNodes( "index" + r );
@@ -100,10 +101,6 @@ public class TestIndexCreation
                         catch ( InterruptedException e )
                         {
                             Thread.interrupted();
-                        }
-                        finally
-                        {
-                            tx.finish();
                         }
                     }
                 } );

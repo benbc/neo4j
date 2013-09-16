@@ -148,22 +148,17 @@ public class ConcurrentCreateAndGetRelationshipsIT
             awaitStartSignal();
             while ( failure.get() == null && !stopSignal.get() )
             {
-                Transaction tx = db.beginTx();
-                try
+                try ( Transaction tx = db.beginTx() )
                 {
                     // ArrayIndexOutOfBoundsException happens here
                     count( parentNode.getRelationships( RELTYPE, OUTGOING ) );
-                    
+
                     parentNode.createRelationshipTo( db.createNode(), RELTYPE );
                     tx.success();
                 }
                 catch ( Exception e )
                 {
                     failure.compareAndSet( null, e );
-                }
-                finally
-                {
-                    tx.finish();
                 }
             }
         }

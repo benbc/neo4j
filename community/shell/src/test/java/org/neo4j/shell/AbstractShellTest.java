@@ -228,17 +228,13 @@ public abstract class AbstractShellTest
 
     protected void assertRelationshipExists( long id )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             db.getRelationshipById( id );
         }
         catch ( NotFoundException e )
         {
             fail( "Relationship " + id + " should exist" );
-        }
-        finally {
-            transaction.finish();
         }
     }
 
@@ -249,18 +245,14 @@ public abstract class AbstractShellTest
 
     protected void assertRelationshipDoesntExist( long id )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             db.getRelationshipById( id );
             fail( "Relationship " + id + " shouldn't exist" );
         }
         catch ( NotFoundException e )
-        { // Good
-        }
-        finally
         {
-            transaction.finish();
+            // Good
         }
     }
 
@@ -271,18 +263,13 @@ public abstract class AbstractShellTest
 
     protected void assertNodeExists( long id )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             db.getNodeById( id );
         }
         catch ( NotFoundException e )
         {
             fail( "Node " + id + " should exist" );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -293,18 +280,14 @@ public abstract class AbstractShellTest
 
     protected void assertNodeDoesntExist( long id )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             db.getNodeById( id );
             fail( "Relationship " + id + " shouldn't exist" );
         }
         catch ( NotFoundException e )
-        { // Good
-        }
-        finally
         {
-            transaction.finish();
+            // Good
         }
     }
 

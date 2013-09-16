@@ -19,27 +19,30 @@
  */
 package org.neo4j.kernel.impl.core;
 
-import static java.lang.Runtime.getRuntime;
-import static java.lang.System.currentTimeMillis;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.graphdb.factory.GraphDatabaseSettings.cache_type;
-import static org.neo4j.graphdb.factory.GraphDatabaseSettings.relationship_grab_size;
-import static org.neo4j.helpers.collection.IteratorUtil.count;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.MyRelTypes;
 import org.neo4j.test.ImpermanentDatabaseRule;
+
+import static java.lang.Runtime.getRuntime;
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.Executors.newCachedThreadPool;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import static org.junit.Assert.assertEquals;
+
+import static org.neo4j.graphdb.factory.GraphDatabaseSettings.cache_type;
+import static org.neo4j.graphdb.factory.GraphDatabaseSettings.relationship_grab_size;
+import static org.neo4j.helpers.collection.IteratorUtil.count;
 
 /**
  * This isn't a deterministic test, but instead tries to trigger a race condition
@@ -97,17 +100,13 @@ public class TestConcurrentRelationshipChainLoadingIssue
                 public void run()
                 {
                     awaitStartSignalAndRandomTimeLonger( startSignal );
-                    Transaction transaction = db.beginTx();
-                    try
+                    try ( Transaction ignored = db.beginTx() )
                     {
                         assertEquals( relCount, count( node.getRelationships() ) );
                     }
                     catch ( Throwable e )
                     {
                         error.set( e );
-                    }
-                    finally {
-                        transaction.finish();
                     }
                 }
             } );

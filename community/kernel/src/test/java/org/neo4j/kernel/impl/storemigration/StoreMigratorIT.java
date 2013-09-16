@@ -255,8 +255,7 @@ public class StoreMigratorIT
 
         private void verifyNodeIdsReused()
         {
-            Transaction transaction = database.beginTx();
-            try
+            try ( Transaction ignored = database.beginTx() )
             {
                 database.getNodeById( 1 );
                 fail( "Node 2 should not exist" );
@@ -265,20 +264,12 @@ public class StoreMigratorIT
             {
                 //expected
             }
-            finally {
-                transaction.finish();
-            }
 
-            transaction = database.beginTx();
-            try
+            try ( Transaction transaction = database.beginTx() )
             {
                 Node newNode = database.createNode();
                 assertEquals( 1, newNode.getId() );
                 transaction.success();
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
 

@@ -418,7 +418,7 @@ public class TestIsolationMultipleThreads
                             }
                         } finally
                         {
-                            tx.finish();
+                            tx.close();
                         }
                     } while (ex != null);
 

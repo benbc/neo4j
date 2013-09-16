@@ -100,33 +100,27 @@ public class LabelsAcceptanceTest
         GraphDatabaseService beansAPI = dbRule.getGraphDatabaseService();
 
         // When I set an empty label
-        Transaction tx = beansAPI.beginTx();
-        try
+        try ( Transaction ignored = beansAPI.beginTx() )
         {
             beansAPI.createNode().addLabel( label( "" ) );
             fail( "Should have thrown exception" );
         }
         catch ( ConstraintViolationException ex )
-        {   // Happy
-        }
-        finally
         {
-            tx.finish();
+            // Happy
+
         }
 
         // And When I set a null label
-        Transaction tx2 = beansAPI.beginTx();
-        try
+        try ( Transaction ignored = beansAPI.beginTx() )
         {
             beansAPI.createNode().addLabel( label( null ) );
             fail( "Should have thrown exception" );
         }
         catch ( ConstraintViolationException ex )
-        {   // Happy
-        }
-        finally
         {
-            tx2.finish();
+            // Happy
+
         }
     }
 
@@ -165,18 +159,15 @@ public class LabelsAcceptanceTest
         GraphDatabaseService beansAPI = beansAPIWithNoMoreLabelIds();
 
         // When
-        Transaction tx = beansAPI.beginTx();
-        try
+        try ( Transaction ignored = beansAPI.beginTx() )
         {
             beansAPI.createNode().addLabel( Labels.MY_LABEL );
             fail( "Should have thrown exception" );
         }
         catch ( ConstraintViolationException ex )
-        {   // Happy
-        }
-        finally
         {
-            tx.finish();
+            // Happy
+
         }
     }
 

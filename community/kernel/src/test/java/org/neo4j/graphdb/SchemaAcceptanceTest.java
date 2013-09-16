@@ -171,8 +171,7 @@ public class SchemaAcceptanceTest
     public void shouldThrowConstraintViolationIfAskedToCreateCompoundIdex() throws Exception
     {
         // WHEN
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Schema schema = db.schema();
             schema.indexFor( label )
@@ -184,10 +183,6 @@ public class SchemaAcceptanceTest
         catch ( UnsupportedOperationException e )
         {
             assertThat( e.getMessage(), containsString( "Compound indexes" ) );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
     
