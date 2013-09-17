@@ -36,16 +36,10 @@ public class Transactor
 
     public void execute()
     {
-        Transaction tx = graphDb.beginTx();
-
-        try
+        try ( Transaction tx = graphDb.beginTx() )
         {
             unitOfWork.doWork();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
     }

@@ -46,26 +46,21 @@ public class Inserter
 				public void run()
 				{
 					while ( true )
-					{
-						Transaction tx = db.beginTx();
-						try
-						{
-							for ( int i = 0; i < 100; i++ )
-							{
-                                String key = keys[i%keys.length];
-                                String value = values[i%values.length]+i;
-                                
-								Node node = db.createNode();
+                    {
+                        try ( Transaction tx = db.beginTx() )
+                        {
+                            for ( int i = 0; i < 100; i++ )
+                            {
+                                String key = keys[i % keys.length];
+                                String value = values[i % values.length] + i;
+
+                                Node node = db.createNode();
                                 node.setProperty( key, value );
-								index.add( node, key, value );
-							}
-							tx.success();
-						}
-						finally
-						{
-							tx.finish();
-						}
-					}
+                                index.add( node, key, value );
+                            }
+                            tx.success();
+                        }
+                    }
 				}
 			}.start();
 		}
@@ -74,16 +69,11 @@ public class Inserter
 
     private static Index<Node> getIndex( GraphDatabaseService db )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction transaction = db.beginTx() )
         {
             Index<Node> index = db.index().forNodes( "myIndex" );
             transaction.success();
             return index;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 }

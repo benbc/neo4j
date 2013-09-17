@@ -108,16 +108,11 @@ public class ConcurrentCreateAndGetRelationshipsIT
 
     private Node createNode( GraphDatabaseService db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

@@ -129,8 +129,7 @@ public class LabelScanStoreIT
     
     private void removeLabels( Node node, Label... labels )
     {
-        Transaction tx = dbRule.getGraphDatabaseService().beginTx();
-        try
+        try ( Transaction tx = dbRule.getGraphDatabaseService().beginTx() )
         {
             for ( Label label : labels )
             {
@@ -138,68 +137,44 @@ public class LabelScanStoreIT
             }
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     private void deleteNode( Node node )
     {
-        Transaction tx = dbRule.getGraphDatabaseService().beginTx();
-        try
+        try ( Transaction tx = dbRule.getGraphDatabaseService().beginTx() )
         {
             node.delete();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
     private Set<Node> getAllNodesWithLabel( Label label )
     {
-        Transaction tx = dbRule.getGraphDatabaseService().beginTx();
-        try
+        try ( Transaction ignored = dbRule.getGraphDatabaseService().beginTx() )
         {
             return asSet( GlobalGraphOperations.at( dbRule.getGraphDatabaseService() ).getAllNodesWithLabel( label ) );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
     private Node createLabeledNode( Label... labels )
     {
-        Transaction tx = dbRule.getGraphDatabaseService().beginTx();
-        try
+        try ( Transaction tx = dbRule.getGraphDatabaseService().beginTx() )
         {
             Node node = dbRule.getGraphDatabaseService().createNode( labels );
             tx.success();
             return node;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
     
     private void addLabels( Node node, Label... labels )
     {
-        Transaction tx = dbRule.getGraphDatabaseService().beginTx();
-        try
+        try ( Transaction tx = dbRule.getGraphDatabaseService().beginTx() )
         {
             for ( Label label : labels )
             {
                 node.addLabel( label );
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

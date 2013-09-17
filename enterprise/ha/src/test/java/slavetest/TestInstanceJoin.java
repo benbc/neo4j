@@ -83,14 +83,9 @@ public class TestInstanceJoin
                     stringMap( ClusterSettings.initial_hosts.name(), "127.0.0.1:5001,127.0.0.1:5002" ) );
             slave.getDependencyResolver().resolveDependency( UpdatePuller.class ).pullUpdates();
 
-            Transaction transaction = slave.beginTx();
-            try
+            try ( Transaction ignored = slave.beginTx() )
             {
                 assertEquals( "store contents differ", value, slave.getNodeById( nodeId ).getProperty( key ) );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
         finally

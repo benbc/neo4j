@@ -114,8 +114,7 @@ public class DatabaseActionsTest
     {
 
         long nodeId;
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().createNode();
             for ( Map.Entry<String, Object> entry : properties.entrySet() )
@@ -125,10 +124,6 @@ public class DatabaseActionsTest
             nodeId = node.getId();
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
         return nodeId;
     }
 
@@ -137,14 +132,9 @@ public class DatabaseActionsTest
     {
         NodeRepresentation noderep = actions.createNode( Collections.<String, Object>emptyMap() );
 
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction ignored = database.getGraph().beginTx() )
         {
             assertNotNull( database.getGraph().getNodeById( noderep.getId() ) );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -165,15 +155,10 @@ public class DatabaseActionsTest
         properties.put( "baz", 17 );
         actions.setAllNodeProperties( nodeId, properties );
 
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction ignored = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().getNodeById( nodeId );
             assertHasProperties( node, properties );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -197,32 +182,22 @@ public class DatabaseActionsTest
     {
 
         long nodeId;
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().createNode();
             node.setProperty( "remove me", "trash" );
             nodeId = node.getId();
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put( "foo", "bar" );
         properties.put( "baz", 17 );
         actions.setAllNodeProperties( nodeId, properties );
-        tx = database.getGraph().beginTx();
-        try
+        try ( Transaction ignored = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().getNodeById( nodeId );
             assertHasProperties( node, properties );
             assertNull( node.getProperty( "remove me", null ) );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -252,14 +227,9 @@ public class DatabaseActionsTest
             tx.finish();
         }
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( properties, serialize( actions.getAllNodeProperties( nodeId ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -268,16 +238,11 @@ public class DatabaseActionsTest
             OperationFailureException
     {
         long nodeId;
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().createNode();
             nodeId = node.getId();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         int nodeCount = graphdbHelper.getNumberOfNodes();
@@ -305,14 +270,9 @@ public class DatabaseActionsTest
         actions.setNodeProperty( nodeId, "emptyArray", new ArrayList<Object>() );
 
         // Then
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertThat( ((List<Object>) serialize( actions.getNodeProperty( nodeId, "emptyArray" ) )).size(), is( 0 ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -322,14 +282,9 @@ public class DatabaseActionsTest
         String key = "foo";
         Object value = "bar";
         long nodeId = createNode( Collections.singletonMap( key, value ) );
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( value, serialize( actions.getNodeProperty( nodeId, key ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -342,18 +297,13 @@ public class DatabaseActionsTest
         long nodeId = createNode( properties );
         actions.removeAllNodeProperties( nodeId );
 
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().getNodeById( nodeId );
             assertEquals( false, node.getPropertyKeys()
                     .iterator()
                     .hasNext() );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -376,8 +326,7 @@ public class DatabaseActionsTest
                 properties )
                 .getId();
 
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction ignored = database.getGraph().beginTx() )
         {
             Relationship rel = database.getGraph().getRelationshipById( relId );
             for ( String key : rel.getPropertyKeys() )
@@ -388,10 +337,6 @@ public class DatabaseActionsTest
             {
                 assertEquals( entry.getValue(), rel.getProperty( entry.getKey() ) );
             }
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -439,17 +384,12 @@ public class DatabaseActionsTest
         long nodeId = createNode( properties );
         actions.removeNodeProperty( nodeId, "foo" );
 
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node node = database.getGraph().getNodeById( nodeId );
             assertEquals( 15, node.getProperty( "number" ) );
             assertEquals( false, node.hasProperty( "foo" ) );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -489,8 +429,7 @@ public class DatabaseActionsTest
         properties.put( "foo", "bar" );
         properties.put( "neo", "Thomas A. Anderson" );
         properties.put( "number", 15L );
-        Transaction tx = database.getGraph().beginTx();
-        try
+        try ( Transaction tx = database.getGraph().beginTx() )
         {
             Node startNode = database.getGraph().createNode();
             Node endNode = database.getGraph().createNode();
@@ -503,19 +442,10 @@ public class DatabaseActionsTest
             relationshipId = relationship.getId();
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( properties, serialize( actions.getAllRelationshipProperties( relationshipId ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -567,8 +497,7 @@ public class DatabaseActionsTest
         graphdbHelper.createRelationship( "LIKES", graphdbHelper.createNode(), nodeId );
         graphdbHelper.createRelationship( "HATES", nodeId, graphdbHelper.createNode() );
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             verifyRelReps( 3,
                     actions.getNodeRelationships( nodeId, RelationshipDirection.all,
@@ -603,10 +532,6 @@ public class DatabaseActionsTest
             verifyRelReps( 1, actions.getNodeRelationships( nodeId, RelationshipDirection.out,
                     Arrays.asList( "HATES" ) ) );
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Test
@@ -614,8 +539,7 @@ public class DatabaseActionsTest
     {
         long nodeId = graphdbHelper.createNode();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             verifyRelReps( 0,
                     actions.getNodeRelationships( nodeId, RelationshipDirection.all,
@@ -626,10 +550,6 @@ public class DatabaseActionsTest
             verifyRelReps( 0,
                     actions.getNodeRelationships( nodeId, RelationshipDirection.out,
                             Collections.<String>emptyList() ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -736,15 +656,10 @@ public class DatabaseActionsTest
         long nodeId = graphdbHelper.createNode();
         String indexName = "fulltext-node";
         graphdbHelper.createNodeFullTextIndex( indexName );
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertFalse( serialize( actions.getIndexedNodes( indexName, key, value ) ).iterator()
                     .hasNext() );
-        }
-        finally
-        {
-            transaction.finish();
         }
         actions.addToNodeIndex( indexName, key, value, nodeId );
         assertEquals( Arrays.asList( nodeId ), graphdbHelper.getIndexedNodes( indexName, key, value ) );
@@ -971,15 +886,10 @@ public class DatabaseActionsTest
     {
         long startNode = createBasicTraversableGraph();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( 2, serialize( actions.traverse( startNode, new HashMap<String, Object>(),
                     TraverserReturnType.node ) ).size() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -988,15 +898,10 @@ public class DatabaseActionsTest
     {
         long startNode = createBasicTraversableGraph();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( 3, serialize( actions.traverse( startNode, MapUtil.map( "max_depth", 2 ),
                     TraverserReturnType.node ) ).size() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1005,8 +910,7 @@ public class DatabaseActionsTest
     {
         long startNode = createBasicTraversableGraph();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( 6, serialize( actions.traverse(
                     startNode,
@@ -1018,10 +922,6 @@ public class DatabaseActionsTest
                             10 ),
                     TraverserReturnType.node ) ).size() );
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Test
@@ -1029,17 +929,12 @@ public class DatabaseActionsTest
     {
         long startNode = createBasicTraversableGraph();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( 3, serialize( actions.traverse( startNode, MapUtil.map( "prune_evaluator", MapUtil.map(
                     "language", "builtin", "name", "none" ), "return_filter", MapUtil.map( "language", "javascript",
                     "body", "position.endNode().getProperty( 'name' ).contains( 'o' )" ) ), TraverserReturnType.node ) )
                     .size() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1048,8 +943,7 @@ public class DatabaseActionsTest
     {
         long startNode = createBasicTraversableGraph();
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertEquals( 3, serialize( actions.traverse( startNode,
                     MapUtil.map( "max_depth", 2, "prune_evaluator", MapUtil.map( "language", "javascript", "body",
@@ -1059,10 +953,6 @@ public class DatabaseActionsTest
                     MapUtil.map( "max_depth", 1, "prune_evaluator", MapUtil.map( "language", "javascript", "body",
                             "position.endNode().getProperty('name').equals('Emil')" ) ), TraverserReturnType.node ) )
                     .size() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1166,8 +1056,7 @@ public class DatabaseActionsTest
         long[] nodes = createMoreComplexGraph();
 
         // /paths
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             List<Object> result = serialize( actions.findPaths(
                     nodes[0],
@@ -1191,10 +1080,6 @@ public class DatabaseActionsTest
                             MapUtil.map( "type", "to", "direction", "out" ), "single", false ) ) );
             assertPaths( 1, nodes, 2, Arrays.<Object>asList( path ) );
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Test
@@ -1202,8 +1087,7 @@ public class DatabaseActionsTest
     {
         long[] nodes = createDijkstraGraph( true );
 
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             // /paths
             assertPaths( 1, nodes, 6, serialize( actions.findPaths(
@@ -1221,10 +1105,6 @@ public class DatabaseActionsTest
             assertPaths( 1, nodes, 6, Arrays.<Object>asList( path ) );
             assertEquals( 6.0d, path.get( "weight" ) );
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Test
@@ -1233,8 +1113,7 @@ public class DatabaseActionsTest
         long[] nodes = createDijkstraGraph( false );
 
         // /paths
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             List<Object> result = serialize( actions.findPaths(
                     nodes[0],
@@ -1251,10 +1130,6 @@ public class DatabaseActionsTest
                             map( "type", "to", "direction", "out" ) ) ) );
             assertPaths( 1, nodes, 6, Arrays.<Object>asList( path ) );
             assertEquals( 6.0d, path.get( "weight" ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1282,15 +1157,10 @@ public class DatabaseActionsTest
         actions.addLabelToNode( node, labels );
 
         // THEN
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             Iterable<String> result = graphdbHelper.getNodeLabels( node );
             assertEquals( labelName, single( result ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1403,16 +1273,11 @@ public class DatabaseActionsTest
         actions.createSchemaIndex( labelName, Arrays.asList( propertyKey ) );
 
         // THEN
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             Iterable<IndexDefinition> defs = graphdbHelper.getSchemaIndexes( labelName );
             assertEquals( 1, count( defs ) );
             assertEquals( propertyKey, first( first( defs ).getPropertyKeys() ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1427,15 +1292,10 @@ public class DatabaseActionsTest
         actions.dropSchemaIndex( labelName, propertyKey );
 
         // THEN
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             assertFalse( "Index should have been dropped", asSet( graphdbHelper.getSchemaIndexes( labelName ) )
                     .contains( index ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -1475,16 +1335,11 @@ public class DatabaseActionsTest
         actions.createPropertyUniquenessConstraint( labelName, asList( propertyKey ) );
 
         // THEN
-        Transaction tx  = graph.beginTx();
-        try
+        try ( Transaction tx = graph.beginTx() )
         {
             Iterable<ConstraintDefinition> defs = graphdbHelper.getPropertyUniquenessConstraints( labelName, propertyKey );
             assertEquals( asSet( propertyKey ), asSet( single( defs ).asUniquenessConstraint().getPropertyKeys() ) );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

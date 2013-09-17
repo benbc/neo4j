@@ -149,8 +149,7 @@ public class StoreMigratorIT
 
     private Node getNodeWithName( GraphDatabaseService db, String name )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             for ( Node node : GlobalGraphOperations.at( db ).getAllNodes() )
             {
@@ -160,10 +159,6 @@ public class StoreMigratorIT
                     return node;
                 }
             }
-        }
-        finally
-        {
-            tx.finish();
         }
         throw new IllegalArgumentException( name + " not found" );
     }
@@ -275,18 +270,13 @@ public class StoreMigratorIT
 
         private void verifyRelationshipIdsReused()
         {
-            Transaction transaction = database.beginTx();
-            try
+            try ( Transaction transaction = database.beginTx() )
             {
                 Node node1 = database.createNode();
                 Node node2 = database.createNode();
                 Relationship relationship1 = node1.createRelationshipTo( node2, withName( "REUSE" ) );
                 assertEquals( 0, relationship1.getId() );
                 transaction.success();
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
     }

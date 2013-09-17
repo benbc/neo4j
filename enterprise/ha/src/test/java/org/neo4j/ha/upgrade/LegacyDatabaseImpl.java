@@ -136,17 +136,12 @@ public class LegacyDatabaseImpl extends UnicastRemoteObject implements LegacyDat
     @Override
     public long createNode( String name )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             node.setProperty( "name", name );
             tx.success();
             return node.getId();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

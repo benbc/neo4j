@@ -88,30 +88,20 @@ public class MandatoryTransactionsForIndexHitsFacadeTests
     private Index<Node> createIndex()
     {
         GraphDatabaseService graphDatabaseService = dbRule.getGraphDatabaseService();
-        Transaction transaction = graphDatabaseService.beginTx();
-        try
+        try ( Transaction transaction = graphDatabaseService.beginTx() )
         {
             Index<Node> index = graphDatabaseService.index().forNodes( "foo" );
             transaction.success();
             return index;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     private IndexHits<Node> queryIndex( Index<Node> index )
     {
         GraphDatabaseService graphDatabaseService = dbRule.getGraphDatabaseService();
-        Transaction transaction = graphDatabaseService.beginTx();
-        try
+        try ( Transaction ignored = graphDatabaseService.beginTx() )
         {
             return index.get( "foo", 42 );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 }

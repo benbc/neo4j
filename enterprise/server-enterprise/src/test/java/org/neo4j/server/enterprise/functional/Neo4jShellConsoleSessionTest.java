@@ -92,16 +92,11 @@ public class Neo4jShellConsoleSessionTest implements ConsoleSessionFactory
     @SuppressWarnings("deprecation")
     private void createData( GraphDatabaseAPI db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.getReferenceNode().createRelationshipTo( db.createNode(), MyRelTypes.TEST );
             db.getReferenceNode().setProperty( "name", "Test" );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

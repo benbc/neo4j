@@ -122,8 +122,7 @@ public class HardKillIT
 
     private long getNamedNode( HighlyAvailableGraphDatabase db, String name )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             for ( Node node : GlobalGraphOperations.at( db ).getAllNodes() )
             {
@@ -136,25 +135,16 @@ public class HardKillIT
             // The lone above will prevent this return from happening
             return -1;
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     private long createNamedNode( HighlyAvailableGraphDatabase db, String name )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             node.setProperty( "name", name );
             tx.success();
             return node.getId();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

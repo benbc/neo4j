@@ -60,52 +60,34 @@ public class IndexingAcceptanceTest
         // GIVEN
         GraphDatabaseService beansAPI = dbRule.getGraphDatabaseAPI();
         long smallValue = 10L, bigValue = 1L << 62;
-        Node myNode = null;
-        {
-            Transaction tx = beansAPI.beginTx();
-            try
-            {
-                myNode = beansAPI.createNode( MY_LABEL );
-                myNode.setProperty( "pad0", true );
-                myNode.setProperty( "pad1", true );
-                myNode.setProperty( "pad2", true );
-                // Use a small long here which will only occupy one property block
-                myNode.setProperty( "key", smallValue );
 
-                tx.success();
-            }
-            finally
-            {
-                tx.finish();
-            }
-        }
+        Node myNode;
+        try ( Transaction tx = beansAPI.beginTx() )
         {
-            IndexDefinition indexDefinition;
-            Transaction tx = beansAPI.beginTx();
-            try
-            {
-                indexDefinition = beansAPI.schema().indexFor( MY_LABEL ).on( "key" ).create();
+            myNode = beansAPI.createNode( MY_LABEL );
+            myNode.setProperty( "pad0", true );
+            myNode.setProperty( "pad1", true );
+            myNode.setProperty( "pad2", true );
+            // Use a small long here which will only occupy one property block
+            myNode.setProperty( "key", smallValue );
 
-                tx.success();
-            }
-            finally
-            {
-                tx.finish();
-            }
-            waitForIndex( beansAPI, indexDefinition );
+            tx.success();
         }
+
+        IndexDefinition indexDefinition;
+        try ( Transaction tx = beansAPI.beginTx() )
+        {
+            indexDefinition = beansAPI.schema().indexFor( MY_LABEL ).on( "key" ).create();
+            tx.success();
+        }
+        waitForIndex( beansAPI, indexDefinition );
 
         // WHEN
-        Transaction tx = beansAPI.beginTx();
-        try
+        try ( Transaction tx = beansAPI.beginTx() )
         {
             // A big long value which will occupy two property blocks
             myNode.setProperty( "key", bigValue );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // THEN
@@ -122,8 +104,7 @@ public class IndexingAcceptanceTest
         // When
         long id;
         {
-            Transaction tx = beansAPI.beginTx();
-            try
+            try ( Transaction tx = beansAPI.beginTx() )
             {
                 Node myNode = beansAPI.createNode();
                 id = myNode.getId();
@@ -132,23 +113,14 @@ public class IndexingAcceptanceTest
 
                 tx.success();
             }
-            finally
-            {
-                tx.finish();
-            }
         }
         {
             IndexDefinition indexDefinition;
-            Transaction tx = beansAPI.beginTx();
-            try
+            try ( Transaction tx = beansAPI.beginTx() )
             {
                 indexDefinition = beansAPI.schema().indexFor( MY_LABEL ).on( "key2" ).create();
 
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
             waitForIndex( beansAPI, indexDefinition );
         }
@@ -321,17 +293,12 @@ public class IndexingAcceptanceTest
     private void assertCanCreateAndFind( GraphDatabaseService db, Label label, String propertyKey, Object value )
     {
         Node created = createNode( db, map( propertyKey, value ), label );
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node found = single( db.findNodesByLabelAndProperty( label, propertyKey, value ) );
-            assertThat(found, equalTo(created));
+            assertThat( found, equalTo( created ) );
             found.delete();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -344,18 +311,13 @@ public class IndexingAcceptanceTest
 
     private Node createNode( GraphDatabaseService beansAPI, Map<String, Object> properties, Label... labels )
     {
-        Transaction tx = beansAPI.beginTx();
-        try
+        try ( Transaction tx = beansAPI.beginTx() )
         {
             Node node = beansAPI.createNode( labels );
-            for ( Map.Entry<String,Object> property : properties.entrySet() )
+            for ( Map.Entry<String, Object> property : properties.entrySet() )
                 node.setProperty( property.getKey(), property.getValue() );
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

@@ -218,26 +218,16 @@ public class TestApps extends AbstractShellTest
         executeCommand( "rmrel -fd " + relationships[1].getId(), "not having any relationships" );
         assertNodeExists( currentNode );
 
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             assertFalse( currentNode.hasRelationship() );
-        }
-        finally
-        {
-            transaction.finish();
         }
 
         executeCommand( "pwd" );
 
-        transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             executeCommand( "cd -a " + db.getReferenceNode().getId() );
-        }
-        finally
-        {
-            transaction.finish();
         }
         executeCommand( "pwd" );
     }
@@ -443,15 +433,10 @@ public class TestApps extends AbstractShellTest
     {
         String type = "ARRAY";
         executeCommand( "mkrel -ct " + type + " --rp \"{'values':[1,2,3,4]}\"" );
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             assertThat( getCurrentNode().getSingleRelationship( withName( type ), OUTGOING ), inTx( db, hasProperty(
                     "values" ).withValue( new int[]{1, 2, 3, 4} ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -460,15 +445,10 @@ public class TestApps extends AbstractShellTest
     {
         String type = "TEST";
         executeCommand( "mkrel -ctl " + type + " Person" );
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             assertThat( getCurrentNode().getSingleRelationship(
                     withName( type ), OUTGOING ).getEndNode(), inTx( db, hasLabels( "Person" ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

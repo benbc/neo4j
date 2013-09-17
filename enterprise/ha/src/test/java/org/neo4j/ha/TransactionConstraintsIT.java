@@ -323,24 +323,18 @@ public class TransactionConstraintsIT extends AbstractClusterTest
 
     private Node createNode( GraphDatabaseService db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             node.setProperty( "name", "yo" );
             tx.success();
             return node;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
     
     private Node createMiniTree( GraphDatabaseService db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node root = db.createNode();
             root.createRelationshipTo( db.createNode(), MyRelTypes.TEST );
@@ -348,23 +342,14 @@ public class TransactionConstraintsIT extends AbstractClusterTest
             tx.success();
             return root;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
     
     private void deleteNode( HighlyAvailableGraphDatabase db, long id )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.getNodeById( id ).delete();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
     
@@ -445,14 +430,9 @@ public class TransactionConstraintsIT extends AbstractClusterTest
 
     private void doABogusTransaction( GraphDatabaseService db ) throws Exception
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             db.createNode();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

@@ -74,15 +74,10 @@ public class TestUniqueKeys extends AbstractClusterTest
                             throw new RuntimeException( e );
                         }
 
-                        Transaction tx = db.beginTx();
-                        try
+                        try ( Transaction tx = db.beginTx() )
                         {
                             db.createNode().createRelationshipTo( db.createNode(), relType );
                             tx.success();
-                        }
-                        finally
-                        {
-                            tx.finish();
                         }
                     }
                 };
@@ -145,15 +140,10 @@ public class TestUniqueKeys extends AbstractClusterTest
                             throw new RuntimeException( e );
                         }
 
-                        Transaction tx = db.beginTx();
-                        try
+                        try ( Transaction tx = db.beginTx() )
                         {
                             db.createNode().setProperty( key, "yes" );
                             tx.success();
-                        }
-                        finally
-                        {
-                            tx.finish();
                         }
                     }
                 };

@@ -92,18 +92,13 @@ public class ManyPropertyKeysIT
     private GraphDatabaseAPI databaseWithManyPropertyKeys( int propertyKeyCount )
     {
         GraphDatabaseAPI db = database();
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.getReferenceNode();
             for ( int i = 0; i < propertyKeyCount; i++ )
                 node.setProperty( key( i ), true );
             tx.success();
             return db;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
     
@@ -114,17 +109,12 @@ public class ManyPropertyKeysIT
 
     private Node createNodeWithProperty( GraphDatabaseService db, String key, Object value )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             node.setProperty( key, value );
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

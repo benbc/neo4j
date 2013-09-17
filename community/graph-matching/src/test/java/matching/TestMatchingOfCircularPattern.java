@@ -270,15 +270,10 @@ public class TestMatchingOfCircularPattern
     public static void setUpDb()
     {
         graphdb = new GraphDatabaseFactory().newEmbeddedDatabase( TargetDirectory.forTest( TestMatchingOfCircularPattern.class ).graphDbDir( true ).getAbsolutePath() );
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             setupGraph();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

@@ -90,8 +90,7 @@ public class TestIdReuse
     
     private void setSomeAndRemoveSomePropertiesFromReferenceNode( GraphDatabaseService graphDatabaseService, Object value )
     {
-        Transaction tx = graphDatabaseService.beginTx();
-        try
+        try ( Transaction tx = graphDatabaseService.beginTx() )
         {
             for ( int i = 0; i < 10; i++ )
             {
@@ -99,22 +98,13 @@ public class TestIdReuse
             }
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
-        tx = graphDatabaseService.beginTx();
-        try
+        try ( Transaction tx = graphDatabaseService.beginTx() )
         {
             for ( int i = 0; i < 10; i++ )
             {
                 graphDatabaseService.getReferenceNode().removeProperty( "key" + i );
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

@@ -75,14 +75,9 @@ public class BlockTest
     {
         expectedException.expect( NotFoundException.class );
 
-        Transaction transaction = database.beginTx();
-        try
+        try ( Transaction ignored = database.beginTx() )
         {
             database.getReferenceNode();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

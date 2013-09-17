@@ -68,7 +68,7 @@ public class Plugin extends ServerPlugin
     @PluginTarget( Node.class )
     public Iterable<Node> getAllConnectedNodes( @Source Node start )
     {
-        ArrayList<Node> nodes = new ArrayList<Node>();
+        ArrayList<Node> nodes = new ArrayList<>();
 
         for ( Relationship rel : start.getRelationships() )
         {
@@ -82,7 +82,7 @@ public class Plugin extends ServerPlugin
     public Iterable<Relationship> getRelationshipsBetween( final @Source Node start,
             final @Parameter( name = "other" ) Node end )
     {
-        return new FilteringIterable<Relationship>( start.getRelationships(), new Predicate<Relationship>()
+        return new FilteringIterable<>( start.getRelationships(), new Predicate<Relationship>()
         {
             @Override
             public boolean accept( Relationship item )
@@ -97,20 +97,14 @@ public class Plugin extends ServerPlugin
     public Iterable<Relationship> createRelationships( @Source Node start,
             @Parameter( name = "type" ) RelationshipType type, @Parameter( name = "nodes" ) Iterable<Node> nodes )
     {
-        List<Relationship> result = new ArrayList<Relationship>();
-        Transaction tx = start.getGraphDatabase()
-                .beginTx();
-        try
+        List<Relationship> result = new ArrayList<>();
+        try ( Transaction tx = start.getGraphDatabase().beginTx() )
         {
             for ( Node end : nodes )
             {
                 result.add( start.createRelationshipTo( end, type ) );
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
         return result;
     }

@@ -94,7 +94,7 @@ public class IncrementalCheckIntegrationTest
             {
                 int ruleId1 = (int) next.schema();
                 int ruleId2 = (int) next.schema();
-                int labelId = (int) next.label();
+                int labelId = next.label();
                 int propertyKeyId = next.propertyKey();
 
                 DynamicRecord record1 = new DynamicRecord( ruleId1 );
@@ -131,7 +131,7 @@ public class IncrementalCheckIntegrationTest
             {
                 int ruleId1 = (int) next.schema();
                 int ruleId2 = (int) next.schema();
-                int labelId = (int) next.label();
+                int labelId = next.label();
                 int propertyKeyId = next.propertyKey();
 
                 DynamicRecord record1 = new DynamicRecord( ruleId1 );
@@ -317,24 +317,23 @@ public class IncrementalCheckIntegrationTest
         @Override
         protected void generateInitialData( GraphDatabaseService graphDb )
         {
-            org.neo4j.graphdb.Transaction tx = graphDb.beginTx();
-            try
+            try ( org.neo4j.graphdb.Transaction tx = graphDb.beginTx() )
             {
                 Node node1 = set( graphDb.createNode(),
-                                  property( "long short short", LONG_SHORT_STRING ) );
+                        property( "long short short", LONG_SHORT_STRING ) );
                 Node node2 = set( graphDb.createNode(),
-                                  property( "long string", LONG_STRING ) );
+                        property( "long string", LONG_STRING ) );
                 Node node3 = set( graphDb.createNode(),
-                                  property( "one", "1" ),
-                                  property( "two", "2" ),
-                                  property( "three", "3" ),
-                                  property( "four", "4" ),
-                                  property( "five", "5" ) );
+                        property( "one", "1" ),
+                        property( "two", "2" ),
+                        property( "three", "3" ),
+                        property( "four", "4" ),
+                        property( "five", "5" ) );
                 Node node4 = set( graphDb.createNode(),
-                                  property( "name", "Leeloo Dallas" ) );
+                        property( "name", "Leeloo Dallas" ) );
                 Node node5 = set( graphDb.createNode(),
-                                  property( "payload", LONG_SHORT_STRING ),
-                                  property( "more", LONG_STRING ) );
+                        property( "payload", LONG_SHORT_STRING ),
+                        property( "more", LONG_STRING ) );
                 Node node6 = set( graphDb.createNode() );
 
                 set( node1.createRelationshipTo( node2, withName( "WHEEL" ) ) );
@@ -350,10 +349,6 @@ public class IncrementalCheckIntegrationTest
                 set( node6.createRelationshipTo( node5, withName( "STAR" ) ) );
 
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
 

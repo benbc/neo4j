@@ -415,18 +415,13 @@ public class TestBackup
         try
         {
             db = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder( serverPath.getPath() ).
-                setConfig( OnlineBackupSettings.online_backup_enabled, Settings.TRUE ).
-                newGraphDatabase();
+                    setConfig( OnlineBackupSettings.online_backup_enabled, Settings.TRUE ).
+                    newGraphDatabase();
 
-            Transaction transaction = db.beginTx();
-            try
+            try ( Transaction transaction = db.beginTx() )
             {
                 db.index().forNodes( "created-no-commits" );
                 transaction.success();
-            }
-            finally
-            {
-                transaction.finish();
             }
 
             OnlineBackup backup = OnlineBackup.from( InetAddress.getLocalHost().getHostAddress() );

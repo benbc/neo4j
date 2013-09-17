@@ -106,17 +106,12 @@ public class TestInjectMultipleStartEntries
 
     private Node createNodeWithOneRelationshipToIt( GraphDatabaseService db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode();
             node.createRelationshipTo( db.createNode(), MyRelTypes.TEST );
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

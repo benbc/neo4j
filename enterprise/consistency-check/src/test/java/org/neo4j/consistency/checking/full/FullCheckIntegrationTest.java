@@ -84,8 +84,7 @@ public class FullCheckIntegrationTest
         @Override
         protected void generateInitialData( GraphDatabaseService graphDb )
         {
-            org.neo4j.graphdb.Transaction tx = graphDb.beginTx();
-            try
+            try ( org.neo4j.graphdb.Transaction tx = graphDb.beginTx() )
             {
                 Node node1 = set( graphDb.createNode() );
                 node1.addLabel( DynamicLabel.label( "label1" ) );
@@ -93,10 +92,6 @@ public class FullCheckIntegrationTest
                 node2.addLabel( DynamicLabel.label( "label2" ) );
                 node1.createRelationshipTo( node2, DynamicRelationshipType.withName( "C" ) );
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
     };
@@ -527,7 +522,7 @@ public class FullCheckIntegrationTest
             {
                 int ruleId1 = (int) next.schema();
                 int ruleId2 = (int) next.schema();
-                int labelId = (int) next.label();
+                int labelId = next.label();
                 int propertyKeyId = next.propertyKey();
 
                 DynamicRecord record1 = new DynamicRecord( ruleId1 );
@@ -572,7 +567,7 @@ public class FullCheckIntegrationTest
             {
                 int ruleId1 = (int) next.schema();
                 int ruleId2 = (int) next.schema();
-                int labelId = (int) next.label();
+                int labelId = next.label();
                 int propertyKeyId = next.propertyKey();
 
                 DynamicRecord record1 = new DynamicRecord( ruleId1 );

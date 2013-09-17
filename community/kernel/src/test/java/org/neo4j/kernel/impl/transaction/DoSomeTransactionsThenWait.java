@@ -33,15 +33,10 @@ public class DoSomeTransactionsThenWait
         int count = Integer.parseInt( args[1] );
         for ( int i = 0; i < count; i++ )
         {
-            Transaction tx = db.beginTx();
-            try
+            try ( Transaction tx = db.beginTx() )
             {
                 db.createNode();
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
         

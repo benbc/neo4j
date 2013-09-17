@@ -304,15 +304,10 @@ public class TestGraphProperties
     {
         GraphDatabaseAPI db = (GraphDatabaseAPI) factory.newImpermanentDatabase();
         GraphProperties graphProperties = db.getNodeManager().getGraphProperties();
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             graphProperties.setProperty( "test", "test" );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         assertEquals( graphProperties, db.getNodeManager().getGraphProperties() );

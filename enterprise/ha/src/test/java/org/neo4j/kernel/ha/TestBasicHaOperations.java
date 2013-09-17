@@ -128,16 +128,11 @@ public class TestBasicHaOperations
         }
 
         HighlyAvailableGraphDatabase master = cluster.getMaster();
-        Transaction transaction = master.beginTx();
-        try
+        try ( Transaction ignored = master.beginTx() )
         {
             String value = master.getNodeById( nodeId ).getProperty( "Hello" ).toString();
             logger.getLogger().info( "Hello=" + value );
             assertEquals( "World", value );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

@@ -204,18 +204,13 @@ public class ConcurrentPropertyAccessIT
     private Node[] createInitialNodes()
     {
         Node[] nodes = new Node[100];
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             for ( int i = 0; i < nodes.length; i++ )
             {
                 nodes[i] = db.createNode();
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
         return nodes;
     }

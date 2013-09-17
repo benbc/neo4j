@@ -120,15 +120,10 @@ public class TestLogPruning
 
     private void doTransaction()
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.createNode();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

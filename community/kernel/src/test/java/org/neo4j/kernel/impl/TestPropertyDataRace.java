@@ -72,18 +72,13 @@ public class TestPropertyDataRace
     {
         final Node one, two;
         final GraphDatabaseService graphdb = database.getGraphDatabaseService();
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             one = graphdb.createNode();
             two = graphdb.createNode();
             one.setProperty( "node", "one" );
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
         clearCaches();
         final CountDownLatch done = new CountDownLatch( 2 ), prepare = new CountDownLatch( 1 );
@@ -92,8 +87,7 @@ public class TestPropertyDataRace
             @Override
             public void run()
             {
-                Transaction txn = graphdb.beginTx();
-                try
+                try ( Transaction txn = graphdb.beginTx() )
                 {
                     for ( String key : one.getPropertyKeys() )
                     {
@@ -104,20 +98,11 @@ public class TestPropertyDataRace
 
                     txn.success();
                 }
-                finally
-                {
-                    txn.finish();
-                }
-                txn = graphdb.beginTx();
-                try
+                try ( Transaction txn = graphdb.beginTx() )
                 {
                     two.setProperty( "node", "two" );
 
                     txn.success();
-                }
-                finally
-                {
-                    txn.finish();
                 }
                 countDown( done );
             }
@@ -127,8 +112,7 @@ public class TestPropertyDataRace
             @Override
             public void run()
             {
-                Transaction txn = graphdb.beginTx();
-                try
+                try ( Transaction txn = graphdb.beginTx() )
                 {
                     while ( true )
                     {
@@ -149,15 +133,11 @@ public class TestPropertyDataRace
 
                     txn.success();
                 }
-                finally
-                {
-                    txn.finish();
-                }
                 clearCaches();
                 done.countDown();
             }
         }.start();
-        
+
         if ( !done.await( 1, MINUTES ) )
         {
             File dumpDirectory = targetDir.directory( "dump", true );
@@ -165,7 +145,7 @@ public class TestPropertyDataRace
             doThreadDump( stringContains( SubProcess.class.getSimpleName() ), dumpDirectory );
             fail( "Test didn't complete within a reasonable time, dumping process information to " + dumpDirectory );
         }
-        
+
         for ( String key : two.getPropertyKeys() )
         {
             assertEquals( "two", two.getProperty( key ) );

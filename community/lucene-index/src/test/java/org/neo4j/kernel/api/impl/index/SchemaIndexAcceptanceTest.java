@@ -197,8 +197,7 @@ public class SchemaIndexAcceptanceTest
 
     private static void doStuff( GraphDatabaseService db, Label label, String propertyKey )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             Iterable<Node> nodes = db.findNodesByLabelAndProperty( label, propertyKey, 3323 );
             for ( Node node : nodes )
@@ -206,24 +205,15 @@ public class SchemaIndexAcceptanceTest
                 count( node.getLabels() );
             }
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     private void createSomeData( Label label, String propertyKey )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.createNode( label );
             node.setProperty( propertyKey, "yeah" );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

@@ -84,16 +84,11 @@ public class IndexOperationsIT extends AbstractClusterTest
         Map<HighlyAvailableGraphDatabase,Index<Node>> indexes = new HashMap<HighlyAvailableGraphDatabase, Index<Node>>();
         for ( HighlyAvailableGraphDatabase db : cluster.getAllMembers() )
         {
-            Transaction transaction = db.beginTx();
-            try
+            try ( Transaction transaction = db.beginTx() )
             {
                 indexManagers.put( db, db.index() );
                 indexes.put( db, db.index().forNodes( key ) );
                 transaction.success();
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
 
@@ -108,31 +103,21 @@ public class IndexOperationsIT extends AbstractClusterTest
         for ( Map.Entry<HighlyAvailableGraphDatabase, IndexManager> entry : indexManagers.entrySet() )
         {
             HighlyAvailableGraphDatabase db = entry.getKey();
-            Transaction transaction = db.beginTx();
-            try
+            try ( Transaction ignored = db.beginTx() )
             {
                 IndexManager indexManager = entry.getValue();
                 assertTrue( indexManager.existsForNodes( key ) );
                 assertEquals( nodeId, indexManager.forNodes( key ).get( key, value ).getSingle().getId() );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
 
         for ( Map.Entry<HighlyAvailableGraphDatabase, Index<Node>> entry : indexes.entrySet() )
         {
             HighlyAvailableGraphDatabase db = entry.getKey();
-            Transaction transaction = db.beginTx();
-            try
+            try ( Transaction ignored = db.beginTx() )
             {
                 Index<Node> index = entry.getValue();
                 assertEquals( nodeId, index.get( key, value ).getSingle().getId() );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
     }
@@ -179,8 +164,7 @@ public class IndexOperationsIT extends AbstractClusterTest
     
     private long createNode( HighlyAvailableGraphDatabase author, String key, Object value, boolean index )
     {
-        Transaction tx = author.beginTx();
-        try
+        try ( Transaction tx = author.beginTx() )
         {
             Node node = author.createNode();
             node.setProperty( key, value );
@@ -189,25 +173,16 @@ public class IndexOperationsIT extends AbstractClusterTest
             tx.success();
             return node.getId();
         }
-        finally
-        {
-            tx.finish();
-        }
     }
     
     private void assertNodeAndIndexingExists( HighlyAvailableGraphDatabase db, long nodeId, String key, Object value )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             Node node = db.getNodeById( nodeId );
             assertEquals( value, node.getProperty( key ) );
             assertTrue( db.index().existsForNodes( key ) );
             assertEquals( node, db.index().forNodes( key ).get( key, value ).getSingle() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
     

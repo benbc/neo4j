@@ -157,17 +157,12 @@ public class UseJOTMAsTxManagerIT
             try
             {
                 db.createNode();
-                Transaction innerTx = db.beginTx();
-                try
+                try ( Transaction innerTx = db.beginTx() )
                 {
                     db.createNode();
                     innerTx.success();
                 }
-                finally
-                {
-                    innerTx.finish();
-                }
-                
+
                 outerTx.success();
 
             }

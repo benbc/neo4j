@@ -98,21 +98,21 @@ public class StreamingJsonFormatPerformanceTest {
     }
 
 
-    private void createData() {
-        final Transaction tx = gdb.beginTx();
-        try {
-            final DynamicRelationshipType TYPE = DynamicRelationshipType.withName("TYPE");
+    private void createData()
+    {
+        try ( Transaction tx = gdb.beginTx() )
+        {
+            final DynamicRelationshipType TYPE = DynamicRelationshipType.withName( "TYPE" );
             Node last = gdb.getReferenceNode();
-            last.setProperty("id", 0);
-            for (int i = 1; i < 10000; i++) {
+            last.setProperty( "id", 0 );
+            for ( int i = 1; i < 10000; i++ )
+            {
                 final Node node = gdb.createNode();
-                last.setProperty("id", i);
-                node.createRelationshipTo(last, TYPE);
+                last.setProperty( "id", i );
+                node.createRelationshipTo( last, TYPE );
                 last = node;
             }
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 }

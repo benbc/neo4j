@@ -236,8 +236,7 @@ public class JavaExecutionEngineDocTest
     @Test
     public void exampleWithParameterForIndexValue() throws Exception
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             // START SNIPPET: exampleWithParameterForIndexValue
             Map<String, Object> params = new HashMap<String, Object>();
@@ -248,17 +247,12 @@ public class JavaExecutionEngineDocTest
             assertEquals( asList( michaelaNode ), this.<Node>toList( result, "n" ) );
             dumpToFile( "exampleWithParameterForIndexValue", query, params );
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Test
     public void exampleWithParametersForQuery() throws Exception
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             // START SNIPPET: exampleWithParametersForQuery
             Map<String, Object> params = new HashMap<String, Object>();
@@ -268,10 +262,6 @@ public class JavaExecutionEngineDocTest
             // END SNIPPET: exampleWithParametersForQuery
             assertEquals( asList( andreasNode ), this.<Node>toList( result, "n" ) );
             dumpToFile( "exampleWithParametersForQuery", query, params );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

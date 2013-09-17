@@ -109,8 +109,7 @@ public class TestCrashWithRebuildSlow
     {
         // Create some strings
         List<Node> nodes = new ArrayList<Node>();
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node previous = null;
             for ( int i = 0; i < 20; i++ )
@@ -124,24 +123,15 @@ public class TestCrashWithRebuildSlow
             }
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
-        
+
         // Delete some of them, but leave some in between deletions
-        tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             delete( nodes.get( 5 ) );
             delete( nodes.get( 7 ) );
             delete( nodes.get( 8 ) );
             delete( nodes.get( 10 ) );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

@@ -89,16 +89,11 @@ public class ConstraintIndexFailureIT
         GraphDatabaseService db = startDatabase();
         try
         {
-            Transaction tx = db.beginTx();
-            try
+            try ( Transaction tx = db.beginTx() )
             {
                 db.schema().constraintFor( label( "Label1" ) ).unique().on( "key1" ).create();
 
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
         finally

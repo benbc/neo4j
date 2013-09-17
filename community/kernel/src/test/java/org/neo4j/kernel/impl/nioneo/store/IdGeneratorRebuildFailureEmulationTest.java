@@ -182,8 +182,7 @@ public class IdGeneratorRebuildFailureEmulationTest
 
     private void verifyData( GraphDatabaseService graphdb )
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction ignored = graphdb.beginTx() )
         {
             int nodecount = 0;
             for ( Node node : GlobalGraphOperations.at( graphdb ).getAllNodes() )
@@ -204,16 +203,11 @@ public class IdGeneratorRebuildFailureEmulationTest
             }
             assertEquals( "The database should have 3 nodes.", 3, nodecount );
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     private void createInitialData( GraphDatabaseService graphdb )
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             Node first = properties( graphdb.createNode() );
             Node other = properties( graphdb.createNode() );
@@ -221,10 +215,6 @@ public class IdGeneratorRebuildFailureEmulationTest
             properties( other.createRelationshipTo( first, DynamicRelationshipType.withName( "DISTRUSTS" ) ) );
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

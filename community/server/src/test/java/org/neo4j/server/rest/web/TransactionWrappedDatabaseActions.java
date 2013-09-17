@@ -59,63 +59,39 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public NodeRepresentation createNode( Map<String, Object> properties, Label... labels ) throws
             PropertyValueException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             NodeRepresentation nodeRepresentation = super.createNode( properties, labels );
             transaction.success();
             return nodeRepresentation;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public NodeRepresentation getNode( long nodeId ) throws NodeNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.getNode( nodeId );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void deleteNode( long nodeId ) throws NodeNotFoundException, OperationFailureException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.deleteNode( nodeId );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public NodeRepresentation getReferenceNode()
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.getReferenceNode();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -123,31 +99,20 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void setNodeProperty( long nodeId, String key, Object value ) throws PropertyValueException,
             NodeNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.setNodeProperty( nodeId, key, value );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void removeNodeProperty( long nodeId, String key ) throws NodeNotFoundException, NoSuchPropertyException
     {
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeNodeProperty( nodeId, key );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -155,32 +120,20 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void setAllNodeProperties( long nodeId, Map<String, Object> properties ) throws PropertyValueException,
             NodeNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.setAllNodeProperties( nodeId, properties );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void removeAllNodeProperties( long nodeId ) throws NodeNotFoundException, PropertyValueException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeAllNodeProperties( nodeId );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -188,49 +141,31 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void addLabelToNode( long nodeId, Collection<String> labelNames ) throws NodeNotFoundException,
             BadInputException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.addLabelToNode( nodeId, labelNames );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void removeLabelFromNode( long nodeId, String labelName ) throws NodeNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeLabelFromNode( nodeId, labelName );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public IndexRepresentation createNodeIndex( Map<String, Object> indexSpecification )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             IndexRepresentation indexRepresentation = super.createNodeIndex( indexSpecification );
             transaction.success();
             return indexRepresentation;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -238,9 +173,7 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public RelationshipRepresentation createRelationship( long startNodeId, long endNodeId, String type, Map<String,
             Object> properties ) throws StartNodeNotFoundException, EndNodeNotFoundException, PropertyValueException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             RelationshipRepresentation relationshipRepresentation = super.createRelationship( startNodeId, endNodeId,
                     type,
@@ -248,40 +181,24 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
             transaction.success();
             return relationshipRepresentation;
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Override
     public RelationshipRepresentation getRelationship( long relationshipId ) throws RelationshipNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.getRelationship( relationshipId );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void deleteRelationship( long relationshipId ) throws RelationshipNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.deleteRelationship( relationshipId );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -289,15 +206,9 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public ListRepresentation getNodeRelationships( long nodeId, RelationshipDirection direction, Collection<String>
             types ) throws NodeNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.getNodeRelationships( nodeId, direction, types );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -305,16 +216,10 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void setAllRelationshipProperties( long relationshipId, Map<String, Object> properties ) throws
             PropertyValueException, RelationshipNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.setAllRelationshipProperties( relationshipId, properties );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -322,16 +227,10 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void setRelationshipProperty( long relationshipId, String key, Object value ) throws
             PropertyValueException, RelationshipNotFoundException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.setRelationshipProperty( relationshipId, key, value );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -339,16 +238,10 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void removeAllRelationshipProperties( long relationshipId ) throws RelationshipNotFoundException,
             PropertyValueException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeAllRelationshipProperties( relationshipId );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -356,146 +249,93 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public void removeRelationshipProperty( long relationshipId, String key ) throws RelationshipNotFoundException,
             NoSuchPropertyException
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeRelationshipProperty( relationshipId, key );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public IndexedEntityRepresentation addToNodeIndex( String indexName, String key, String value, long nodeId )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             IndexedEntityRepresentation indexedEntityRepresentation = super.addToNodeIndex( indexName, key, value,
                     nodeId );
             transaction.success();
             return indexedEntityRepresentation;
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Override
     public void removeFromNodeIndex( String indexName, String key, String value, long id )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeFromNodeIndex( indexName, key, value, id );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void removeFromNodeIndexNoValue( String indexName, String key, long id )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeFromNodeIndexNoValue( indexName, key, id );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public void removeFromNodeIndexNoKeyValue( String indexName, long id )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             super.removeFromNodeIndexNoKeyValue( indexName, id );
             transaction.success();
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public PathRepresentation findSinglePath( long startId, long endId, Map<String, Object> map )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.findSinglePath( startId, endId, map );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public ListRepresentation getNodesWithLabel( String labelName, Map<String, Object> properties )
     {
-        Transaction transaction = graph.beginTx();
-        try
+        try ( Transaction ignored = graph.beginTx() )
         {
             return super.getNodesWithLabel( labelName, properties );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     @Override
     public IndexDefinitionRepresentation createSchemaIndex( String labelName, Iterable<String> propertyKey )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             IndexDefinitionRepresentation indexDefinitionRepresentation = super.createSchemaIndex( labelName,
                     propertyKey );
             transaction.success();
             return indexDefinitionRepresentation;
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Override
     public boolean dropSchemaIndex( String labelName, String propertyKey )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             boolean result = super.dropSchemaIndex( labelName, propertyKey );
             transaction.success();
             return result;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -503,35 +343,23 @@ public class TransactionWrappedDatabaseActions extends DatabaseActions
     public ConstraintDefinitionRepresentation createPropertyUniquenessConstraint( String labelName,
                                                                                   Iterable<String> propertyKeys )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             ConstraintDefinitionRepresentation constraintDefinitionRepresentation = super
                     .createPropertyUniquenessConstraint( labelName, propertyKeys );
             transaction.success();
             return constraintDefinitionRepresentation;
         }
-        finally
-        {
-            transaction.finish();
-        }
     }
 
     @Override
     public boolean dropPropertyUniquenessConstraint( String labelName, Iterable<String> propertyKeys )
     {
-        Transaction transaction = graph.beginTx();
-
-        try
+        try ( Transaction transaction = graph.beginTx() )
         {
             boolean result = super.dropPropertyUniquenessConstraint( labelName, propertyKeys );
             transaction.success();
             return result;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 }

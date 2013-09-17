@@ -84,39 +84,24 @@ public class DeletionTest
         HighlyAvailableGraphDatabase slave = cluster.getAnySlave();
 
         Relationship rel;
-        Transaction tx = slave.beginTx();
-        try
+        try ( Transaction tx = slave.beginTx() )
         {
             rel = slave.createNode().createRelationshipTo( slave.createNode(), withName( "FOO" ) );
 
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
 
-        Transaction transaction = master.beginTx();
-        try
+        try ( Transaction ignored = master.beginTx() )
         {
             assertNotNull( master.getRelationshipById( rel.getId() ) );
         }
-        finally
-        {
-            transaction.finish();
-        }
 
         // when
-        tx = slave.beginTx();
-        try
+        try ( Transaction tx = slave.beginTx() )
         {
             rel.delete();
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // then - there should have been no exceptions

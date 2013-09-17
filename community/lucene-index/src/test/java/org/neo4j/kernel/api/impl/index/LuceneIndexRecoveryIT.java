@@ -121,15 +121,10 @@ public class LuceneIndexRecoveryIT
     
     private void deleteNode( long node )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.getNodeById( node ).delete();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -150,8 +145,7 @@ public class LuceneIndexRecoveryIT
         // When
         startDb( createAlwaysInitiallyPopulatingLuceneIndexFactory() );
 
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             IndexDefinition indexDefinition = db.schema().getIndexes().iterator().next();
             db.schema().awaitIndexOnline( indexDefinition, 10l, TimeUnit.SECONDS );
@@ -159,10 +153,6 @@ public class LuceneIndexRecoveryIT
             // Then
             assertEquals( 12, db.getNodeById( nodeId ).getProperty( NUM_BANANAS_KEY ) );
             assertEquals( 1, doIndexLookup( myLabel, 12 ).size() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -286,32 +276,22 @@ public class LuceneIndexRecoveryIT
     private long createNode( Label label, int number )
            throws PropertyKeyNotFoundException, LabelNotFoundKernelException
     {
-       Transaction tx = db.beginTx();
-       try
-       {
-           Node node = db.createNode( label );
-           node.setProperty( NUM_BANANAS_KEY, number );
-           tx.success();
-           return node.getId();
-       }
-       finally
-       {
-           tx.finish();
-       }
+        try ( Transaction tx = db.beginTx() )
+        {
+            Node node = db.createNode( label );
+            node.setProperty( NUM_BANANAS_KEY, number );
+            tx.success();
+            return node.getId();
+        }
     }
 
     private void updateNode( long nodeId, int value )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.getNodeById( nodeId );
             node.setProperty( NUM_BANANAS_KEY, value );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

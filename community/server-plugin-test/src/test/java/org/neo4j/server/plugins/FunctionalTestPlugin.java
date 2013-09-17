@@ -71,8 +71,7 @@ public class FunctionalTestPlugin extends ServerPlugin
     public Iterable<Node> getAllConnectedNodes( @Source Node start )
     {
         ArrayList<Node> nodes = new ArrayList<>();
-        Transaction tx = start.getGraphDatabase().beginTx();
-        try
+        try ( Transaction tx = start.getGraphDatabase().beginTx() )
         {
             for ( Relationship rel : start.getRelationships() )
             {
@@ -81,10 +80,6 @@ public class FunctionalTestPlugin extends ServerPlugin
 
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
         return nodes;
     }
 
@@ -92,8 +87,7 @@ public class FunctionalTestPlugin extends ServerPlugin
     public Iterable<Relationship> getRelationshipsBetween( final @Source Node start,
             final @Parameter( name = "other" ) Node end )
     {
-        Transaction tx = start.getGraphDatabase().beginTx();
-        try
+        try ( Transaction ignored = start.getGraphDatabase().beginTx() )
         {
             return new FilteringIterable<>( start.getRelationships(), new Predicate<Relationship>()
             {
@@ -104,10 +98,6 @@ public class FunctionalTestPlugin extends ServerPlugin
                 }
             } );
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     @PluginTarget( Node.class )
@@ -115,18 +105,13 @@ public class FunctionalTestPlugin extends ServerPlugin
             @Parameter( name = "type" ) RelationshipType type, @Parameter( name = "nodes" ) Iterable<Node> nodes )
     {
         List<Relationship> result = new ArrayList<>();
-        Transaction tx = start.getGraphDatabase().beginTx();
-        try
+        try ( Transaction tx = start.getGraphDatabase().beginTx() )
         {
             for ( Node end : nodes )
             {
                 result.add( start.createRelationshipTo( end, type ) );
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
         return result;
     }
@@ -141,51 +126,36 @@ public class FunctionalTestPlugin extends ServerPlugin
             return start;
         }
 
-        Transaction tx = start.getGraphDatabase().beginTx();
-        try
+        try ( Transaction tx = start.getGraphDatabase().beginTx() )
         {
             Node node = start.getGraphDatabase().getNodeById( id );
 
             tx.success();
             return node;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     @PluginTarget( GraphDatabaseService.class )
     public Node methodWithIntParam( @Source GraphDatabaseService db, @Parameter( name = "id", optional = false ) int id )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node node = db.getNodeById( id );
 
             tx.success();
             return node;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     @PluginTarget( Relationship.class )
     public Iterable<Node> methodOnRelationship( @Source Relationship rel )
     {
-        Transaction tx = rel.getGraphDatabase().beginTx();
-        try
+        try ( Transaction tx = rel.getGraphDatabase().beginTx() )
         {
             List<Node> nodes = Arrays.asList( rel.getNodes() );
 
             tx.success();
             return nodes;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
@@ -266,8 +236,7 @@ public class FunctionalTestPlugin extends ServerPlugin
     public Path pathToReference( @Source Node me )
     {
         PathFinder<Path> finder = GraphAlgoFactory.shortestPath( Traversal.expanderForAllTypes(), 6 );
-        Transaction tx = me.getGraphDatabase().beginTx();
-        try
+        try ( Transaction tx = me.getGraphDatabase().beginTx() )
         {
             @SuppressWarnings("deprecation")
             Path path = finder.findSinglePath( me.getGraphDatabase().getReferenceNode(), me );
@@ -275,26 +244,17 @@ public class FunctionalTestPlugin extends ServerPlugin
             tx.success();
             return path;
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     private Node referenceNode( GraphDatabaseService db )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             @SuppressWarnings("deprecation")
             Node node = db.getReferenceNode();
 
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

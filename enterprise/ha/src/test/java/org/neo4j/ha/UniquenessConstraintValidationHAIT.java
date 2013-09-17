@@ -70,17 +70,12 @@ public class UniquenessConstraintValidationHAIT
 
         // when
         Future<Boolean> created;
-        Transaction tx = slave1.beginTx();
-        try
+        try ( Transaction tx = slave1.beginTx() )
         {
             slave1.createNode( label( "Label1" ) ).setProperty( "key1", "value1" );
 
             created = otherThread.execute( createNode( slave2, "Label1", "key1", "value2" ) );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // then
@@ -99,8 +94,7 @@ public class UniquenessConstraintValidationHAIT
 
         // when
         Future<Boolean> created;
-        Transaction tx = slave1.beginTx();
-        try
+        try ( Transaction tx = slave1.beginTx() )
         {
             slave1.createNode( label( "Label1" ) ).setProperty( "key1", "value1" );
 
@@ -109,10 +103,6 @@ public class UniquenessConstraintValidationHAIT
             assertThat( otherThread, isWaiting() );
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // then
@@ -131,8 +121,7 @@ public class UniquenessConstraintValidationHAIT
 
         // when
         Future<Boolean> created;
-        Transaction tx = master.beginTx();
-        try
+        try ( Transaction tx = master.beginTx() )
         {
             master.createNode( label( "Label1" ) ).setProperty( "key1", 0x0099CC );
 
@@ -141,10 +130,6 @@ public class UniquenessConstraintValidationHAIT
             assertThat( otherThread, isWaiting() );
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // then
@@ -163,8 +148,7 @@ public class UniquenessConstraintValidationHAIT
 
         // when
         Future<Boolean> created;
-        Transaction tx = slave1.beginTx();
-        try
+        try ( Transaction tx = slave1.beginTx() )
         {
             slave1.createNode( label( "Label1" ) ).setProperty( "key1", "value1" );
 
@@ -173,10 +157,6 @@ public class UniquenessConstraintValidationHAIT
             assertThat( otherThread, isWaiting() );
 
             tx.failure();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         // then
@@ -198,16 +178,11 @@ public class UniquenessConstraintValidationHAIT
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( storeDir.getAbsolutePath() );
         try
         {
-            Transaction tx = graphDb.beginTx();
-            try
+            try ( Transaction tx = graphDb.beginTx() )
             {
                 graphDb.schema().constraintFor( label( label ) ).unique().on( propertyKey ).create();
 
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
         finally

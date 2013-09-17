@@ -68,15 +68,10 @@ public class ClusterTest
 
 
             HighlyAvailableGraphDatabase slave = clusterManager.getDefaultCluster().getAnySlave();
-            Transaction transaction = slave.beginTx();
-            try
+            try ( Transaction ignored = slave.beginTx() )
             {
                 node = slave.getNodeById( nodeId );
                 assertThat( node.getProperty( "foo" ).toString(), CoreMatchers.equalTo( "bar" ) );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
         finally

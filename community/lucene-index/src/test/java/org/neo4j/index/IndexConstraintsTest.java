@@ -67,8 +67,7 @@ public class IndexConstraintsTest
             {
                 public Node call() throws Exception
                 {
-                    Transaction tx = graphDb.beginTx();
-                    try
+                    try ( Transaction tx = graphDb.beginTx() )
                     {
                         final Node node = graphDb.createNode();
                         // Acquire write lock on common node
@@ -84,10 +83,6 @@ public class IndexConstraintsTest
                         index.add( node, "uuid", uuid );
                         tx.success();
                         return node;
-                    }
-                    finally
-                    {
-                        tx.finish();
                     }
                 }
             } );

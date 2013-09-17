@@ -122,14 +122,9 @@ public class QuorumWritesIT
 
         Node finalNode = doTx( master );
 
-        Transaction transaction = slave2.beginTx();
-        try
+        try ( Transaction ignored = slave2.beginTx() )
         {
             slave2.getNodeById( finalNode.getId() );
-        }
-        finally
-        {
-            transaction.finish();
         }
 
         clusterManager.stop();
@@ -212,14 +207,9 @@ public class QuorumWritesIT
 
         Node finalNode = doTx( master );
 
-        Transaction transaction = replacement.beginTx();
-        try
+        try ( Transaction ignored = replacement.beginTx() )
         {
             replacement.getNodeById( finalNode.getId() );
-        }
-        finally
-        {
-            transaction.finish();
         }
 
         clusterManager.stop();

@@ -173,16 +173,11 @@ public class IndexRestartIt
 
     private void dropIndex( IndexDefinition index, DoubleLatch populationCompletionLatch )
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             index.drop();
             populationCompletionLatch.finish();
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

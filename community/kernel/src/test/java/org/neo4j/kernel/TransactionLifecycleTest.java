@@ -35,17 +35,12 @@ public class TransactionLifecycleTest
     public void givenACallToFailATransactionSubsequentSuccessCallsShouldBeSwallowedSilently()
     {
         GraphDatabaseService graphdb = database.getGraphDatabaseService();
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             graphdb.createNode();
             tx.failure();
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

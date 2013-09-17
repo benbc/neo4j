@@ -42,8 +42,7 @@ public class CreateAndDeleteNodesIT
         Node myNode;
 
         // When
-        Transaction tx = beansAPI.beginTx();
-        try
+        try ( Transaction tx = beansAPI.beginTx() )
         {
             myNode = beansAPI.createNode();
             myNode.setProperty( "Name", "Bob" );
@@ -51,14 +50,9 @@ public class CreateAndDeleteNodesIT
             myNode.createRelationshipTo( beansAPI.getReferenceNode(), RelTypes.ASD );
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
 
         // When
-        Transaction tx2 = beansAPI.beginTx();
-        try
+        try ( Transaction tx = beansAPI.beginTx() )
         {
             for ( Relationship r : GlobalGraphOperations.at( beansAPI ).getAllRelationships() )
             {
@@ -70,10 +64,7 @@ public class CreateAndDeleteNodesIT
                 n.delete();
             }
 
-            tx2.success();
-        } finally
-        {
-            tx2.finish();
+            tx.success();
         }
     }
 }

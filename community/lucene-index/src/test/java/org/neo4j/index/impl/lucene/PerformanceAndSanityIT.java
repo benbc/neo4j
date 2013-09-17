@@ -192,8 +192,7 @@ public class PerformanceAndSanityIT extends AbstractLuceneIndexTest
                         }
                         else
                         {
-                            Transaction tx = graphDb.beginTx();
-                            try
+                            try ( Transaction ignored = graphDb.beginTx() )
                             {
                                 for ( int ii = 0; ii < 20; ii++ )
                                 {
@@ -201,10 +200,6 @@ public class PerformanceAndSanityIT extends AbstractLuceneIndexTest
                                     index.add( node, "key", "value" + ii );
                                 }
                                 tx.success();
-                            }
-                            finally
-                            {
-                                tx.finish();
                             }
                         }
                     }
@@ -243,22 +238,17 @@ public class PerformanceAndSanityIT extends AbstractLuceneIndexTest
                         for ( int i = 0; i < count; i+=group )
                         {
                             if ( halt.get() ) break;
-                            Transaction tx = graphDb.beginTx();
-                            try
+                            try ( Transaction ignored = graphDb.beginTx() )
                             {
                                 for ( int ii = 0; ii < group; ii++ )
                                 {
                                     Node node = graphDb.createNode();
-                                    index.get( "key", "value" + System.currentTimeMillis()%count ).getSingle();
+                                    index.get( "key", "value" + System.currentTimeMillis() % count ).getSingle();
                                     index.add( node, "key", "value" + id.getAndIncrement() );
                                 }
                                 tx.success();
                             }
-                            finally
-                            {
-                                tx.finish();
-                            }
-                            if ( i%100 == 0 ) System.out.println( threadId + ": " + i );
+                            if ( i % 100 == 0 ) System.out.println( threadId + ": " + i );
                         }
                     }
                     catch ( Exception e )

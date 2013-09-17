@@ -282,7 +282,7 @@ public class TestLuceneBatchInsert
     {
         BatchInserterIndexProvider provider = new LuceneBatchInserterIndexProviderNewImpl( inserter );
         BatchInserterIndex index = provider.nodeIndex( "node_auto_index", EXACT_CONFIG );
-        
+
         long id = inserter.createNode( null );
         Map<String, Object> props = new HashMap<String, Object>();
         props.put( "name", "peter" );
@@ -295,27 +295,22 @@ public class TestLuceneBatchInsert
                 configure( GraphDatabaseSettings.relationship_keys_indexable, "relProp1,relProp2" ),
                 configure( GraphDatabaseSettings.node_auto_indexing, "true" ),
                 configure( GraphDatabaseSettings.relationship_auto_indexing, "true" ) );
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             // Create the primitives
             Node node1 = db.createNode();
-         
+
             // Add indexable and non-indexable properties
             node1.setProperty( "name", "bob" );
-         
+
             // Make things persistent
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
 
-        tx = db.beginTx();
-        assertTrue(db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "peter" ).hasNext());
-        assertTrue(db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "bob" ).hasNext());
-        assertFalse(db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "joe" ).hasNext());
+        Transaction tx = db.beginTx();
+        assertTrue( db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "peter" ).hasNext() );
+        assertTrue( db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "bob" ).hasNext() );
+        assertFalse( db.index().getNodeAutoIndexer().getAutoIndex().get( "name", "joe" ).hasNext() );
         tx.finish();
     }
 
@@ -444,15 +439,10 @@ public class TestLuceneBatchInsert
         // THEN -- both indexes should exist when starting up in "graph mode"
         {
             switchToGraphDatabaseService();
-            Transaction transaction = db.beginTx();
-            try
+            try ( Transaction ignored = db.beginTx() )
             {
                 assertTrue( indexName1 + " should exist", db.index().existsForNodes( indexName1 ) );
                 assertTrue( indexName2 + " should exist", db.index().existsForNodes( indexName2 ) );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
     }

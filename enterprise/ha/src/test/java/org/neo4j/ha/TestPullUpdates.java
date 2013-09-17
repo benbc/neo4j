@@ -95,7 +95,7 @@ public class TestPullUpdates
     {
         File root = TargetDirectory.forTest( getClass() ).directory( "pullUpdatesShellAppPullsUpdates", true );
         Map<Integer, Map<String, String>> instanceConfig = new HashMap<Integer, Map<String, String>>();
-        for (int i = 1; i <= 2; i++)
+        for ( int i = 1; i <= 2; i++ )
         {
             Map<String, String> thisInstance =
                     MapUtil.stringMap( ShellSettings.remote_shell_port.name(), "" + (SHELL_PORT + i) );
@@ -103,23 +103,18 @@ public class TestPullUpdates
         }
         ClusterManager clusterManager = new ClusterManager( clusterOfSize( 2 ), root, MapUtil.stringMap(
                 HaSettings.pull_interval.name(), "0",
-                HaSettings.tx_push_factor.name(), "0" ,
+                HaSettings.tx_push_factor.name(), "0",
                 ShellSettings.remote_shell_enabled.name(), "true"
-                ), instanceConfig );
+        ), instanceConfig );
         clusterManager.start();
         cluster = clusterManager.getDefaultCluster();
 
         setProperty( cluster.getMaster(), 1 );
         callPullUpdatesViaShell( 2 );
         HighlyAvailableGraphDatabase slave = cluster.getAnySlave();
-        Transaction transaction = slave.beginTx();
-        try
+        try ( Transaction ignored = slave.beginTx() )
         {
             assertEquals( 1, slave.getReferenceNode().getProperty( "i" ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -162,14 +157,9 @@ public class TestPullUpdates
                     .setConfig( HaSettings.pull_interval, "0" ) // no pull updates, should pull on startup
                     .newGraphDatabase();
 
-            Transaction transaction = slave.beginTx();
-            try
+            try ( Transaction ignored = slave.beginTx() )
             {
                 assertEquals( "master", slave.getNodeById( nodeId ).getProperty( "from" ) );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
         finally
@@ -221,15 +211,10 @@ public class TestPullUpdates
 
     private void setProperty( HighlyAvailableGraphDatabase db, int i ) throws Exception
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             db.getReferenceNode().setProperty( "i", i );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 }

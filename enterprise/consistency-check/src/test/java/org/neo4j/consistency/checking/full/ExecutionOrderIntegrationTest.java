@@ -79,17 +79,12 @@ public class ExecutionOrderIntegrationTest
         protected void generateInitialData( GraphDatabaseService graphDb )
         {
             // TODO: create bigger sample graph here
-            org.neo4j.graphdb.Transaction tx = graphDb.beginTx();
-            try
+            try ( org.neo4j.graphdb.Transaction tx = graphDb.beginTx() )
             {
                 Node node1 = set( graphDb.createNode() );
                 Node node2 = set( graphDb.createNode(), property( "key", "value" ) );
                 node1.createRelationshipTo( node2, DynamicRelationshipType.withName( "C" ) );
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
     };

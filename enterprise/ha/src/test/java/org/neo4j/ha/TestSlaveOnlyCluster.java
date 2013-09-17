@@ -76,7 +76,7 @@ public class TestSlaveOnlyCluster
 
             for ( HighlyAvailableGraphDatabase highlyAvailableGraphDatabase : clusterManager.getDefaultCluster().getAllMembers() )
             {
-                if (!highlyAvailableGraphDatabase.isMaster())
+                if ( !highlyAvailableGraphDatabase.isMaster() )
                 {
                     highlyAvailableGraphDatabase.getDependencyResolver().resolveDependency( ClusterClient.class ).addHeartbeatListener( masterDownListener );
 
@@ -100,7 +100,7 @@ public class TestSlaveOnlyCluster
 
             electedLatch.await();
 
-            HighlyAvailableGraphDatabase slaveDatabase = clusterManager.getDefaultCluster().getAnySlave(  );
+            HighlyAvailableGraphDatabase slaveDatabase = clusterManager.getDefaultCluster().getAnySlave();
             Transaction tx = slaveDatabase.beginTx();
             Node node = slaveDatabase.createNode();
             node.setProperty( "foo", "bar" );
@@ -108,14 +108,9 @@ public class TestSlaveOnlyCluster
             tx.success();
             tx.finish();
 
-            Transaction transaction = master.beginTx();
-            try
+            try ( Transaction ignored = master.beginTx() )
             {
                 assertThat( master.getNodeById( nodeId ).getProperty( "foo" ).toString(), equalTo( "bar" ) );
-            }
-            finally
-            {
-                transaction.finish();
             }
         }
         finally

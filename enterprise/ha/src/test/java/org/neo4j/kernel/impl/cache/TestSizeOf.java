@@ -93,30 +93,32 @@ public class TestSizeOf
     private Node createNodeAndLoadFresh( Map<String, Object> properties, int nrOfRelationships, int nrOfTypes, int directionStride )
     {
         Node node = null;
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             node = db.createNode();
             setProperties( properties, node );
             for ( int t = 0; t < nrOfTypes; t++ )
             {
                 RelationshipType type = DynamicRelationshipType.withName( relTypeName( t ) );
-                for ( int i = 0, dir = 0; i < nrOfRelationships; i++, dir = (dir+directionStride)%3 )
+                for ( int i = 0, dir = 0; i < nrOfRelationships; i++, dir = (dir + directionStride) % 3 )
                 {
                     switch ( dir )
                     {
-                    case 0: node.createRelationshipTo( db.createNode(), type ); break;
-                    case 1: db.createNode().createRelationshipTo( node, type ); break;
-                    case 2: node.createRelationshipTo( node, type ); break;
-                    default: throw new IllegalArgumentException( "Invalid direction " + dir );
+                        case 0:
+                            node.createRelationshipTo( db.createNode(), type );
+                            break;
+                        case 1:
+                            db.createNode().createRelationshipTo( node, type );
+                            break;
+                        case 2:
+                            node.createRelationshipTo( node, type );
+                            break;
+                        default:
+                            throw new IllegalArgumentException( "Invalid direction " + dir );
                     }
                 }
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         clearCache();
@@ -125,7 +127,8 @@ public class TestSizeOf
         {
             loadProperties( node );
         }
-        if ( nrOfRelationships*nrOfTypes > 0 ) {
+        if ( nrOfRelationships * nrOfTypes > 0 )
+        {
             countRelationships( node );
         }
 
@@ -134,30 +137,20 @@ public class TestSizeOf
 
     private void countRelationships( Node node )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             count( node.getRelationships() );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
     private void loadProperties( PropertyContainer entity )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             for ( String key : entity.getPropertyKeys() )
             {
                 entity.getProperty( key );
             }
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 
@@ -172,16 +165,11 @@ public class TestSizeOf
     private Relationship createRelationshipAndLoadFresh( Map<String, Object> properties )
     {
         Relationship relationship = null;
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             relationship = db.createNode().createRelationshipTo( db.createNode(), MyRelTypes.TEST );
             setProperties( properties, relationship );
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
 
         clearCache();

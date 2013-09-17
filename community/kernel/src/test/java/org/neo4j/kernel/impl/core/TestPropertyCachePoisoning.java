@@ -161,15 +161,10 @@ public class TestPropertyCachePoisoning
                 @Override
                 public void run()
                 {
-                    Transaction tx = graphdb.beginTx();
-                    try
+                    try ( Transaction tx = graphdb.beginTx() )
                     {
                         perform();
                         tx.success();
-                    }
-                    finally
-                    {
-                        tx.finish();
                     }
                 }
             }.start();
@@ -184,15 +179,10 @@ public class TestPropertyCachePoisoning
 
         TX()
         {
-            Transaction tx = graphdb.beginTx();
-            try
+            try ( Transaction tx = graphdb.beginTx() )
             {
                 value = perform();
                 tx.success();
-            }
-            finally
-            {
-                tx.finish();
             }
         }
 

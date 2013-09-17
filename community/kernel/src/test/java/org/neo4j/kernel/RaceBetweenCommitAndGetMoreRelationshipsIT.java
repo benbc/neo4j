@@ -41,7 +41,7 @@ public class RaceBetweenCommitAndGetMoreRelationshipsIT extends TimerTask
     private final GraphDatabaseService graphdb;
     private final NodeManager nodeManager;
     private final Timer timer;
-    private final Exchanger<Throwable> error = new Exchanger<Throwable>();
+    private final Exchanger<Throwable> error = new Exchanger<>();
 
     /**
      * A hack to transport the test to the main thread through the debugger
@@ -163,8 +163,7 @@ public class RaceBetweenCommitAndGetMoreRelationshipsIT extends TimerTask
 
     protected void setup( int relCount )
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             Node root = graphdb.getReferenceNode();
             for ( int i = 0; i < relCount; i++ )
@@ -173,10 +172,6 @@ public class RaceBetweenCommitAndGetMoreRelationshipsIT extends TimerTask
             }
 
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

@@ -60,8 +60,7 @@ public class PagedTraverserTest
 
     private void createLinkedList( int listLength, Database db )
     {
-        Transaction tx = db.getGraph().beginTx();
-        try
+        try ( Transaction tx = db.getGraph().beginTx() )
         {
             Node previous = null;
             for ( int i = 0; i < listLength; i++ )
@@ -81,10 +80,6 @@ public class PagedTraverserTest
             }
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     @Test
@@ -103,8 +98,7 @@ public class PagedTraverserTest
     @SuppressWarnings( "unused" )
     private int iterateThroughPagedTraverser( PagedTraverser traversalPager )
     {
-        Transaction transaction = database.getGraph().beginTx();
-        try
+        try ( Transaction ignored = database.getGraph().beginTx() )
         {
             int count = 0;
             for ( List<Path> paths : traversalPager )
@@ -112,10 +106,6 @@ public class PagedTraverserTest
                 count++;
             }
             return count;
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

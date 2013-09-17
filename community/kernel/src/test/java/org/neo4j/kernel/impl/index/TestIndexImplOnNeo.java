@@ -106,14 +106,9 @@ public class TestIndexImplOnNeo
 
     private boolean indexExists( String indexName )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             return db.index().existsForNodes( indexName );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 }

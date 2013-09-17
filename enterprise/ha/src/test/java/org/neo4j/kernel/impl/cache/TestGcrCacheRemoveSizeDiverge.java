@@ -88,18 +88,13 @@ public class TestGcrCacheRemoveSizeDiverge
 
     private Node createNodeWithSomeRelationships()
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             Node node = graphdb.createNode();
             for ( int i = 0; i < 10; i++ )
                 node.createRelationshipTo( node, MyRelTypes.TEST );
             tx.success();
             return node;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
     
@@ -150,14 +145,9 @@ public class TestGcrCacheRemoveSizeDiverge
         final Node node = createNodeWithSomeRelationships();
         graphdb.getDependencyResolver().resolveDependency( NodeManager.class ).clearCache();
         enableBreakpoints();
-        Transaction transaction = graphdb.beginTx();
-        try
+        try ( Transaction ignored = graphdb.beginTx() )
         {
             graphdb.getNodeById( node.getId() );
-        }
-        finally
-        {
-            transaction.finish();
         }
         final Cache<?> nodeCache = graphdb.getDependencyResolver().resolveDependency( NodeManager.class ).caches().iterator().next();
         assertTrue( "We didn't get a hold of the right cache object", nodeCache.getName().toLowerCase().contains( "node" ) );
@@ -168,14 +158,9 @@ public class TestGcrCacheRemoveSizeDiverge
             public void run()
             {
                 // It will break in NodeImpl#loadInitialRelationships right before calling updateSize
-                Transaction transaction = graphdb.beginTx();
-                try
+                try ( Transaction ignored = graphdb.beginTx() )
                 {
                     count( node.getRelationships() );
-                }
-                finally
-                {
-                    transaction.finish();
                 }
             }
         };
@@ -183,7 +168,7 @@ public class TestGcrCacheRemoveSizeDiverge
         // TODO wait for latch instead, but it seems to be a different instance than the one we countDown.
 //        latch.await();
         Thread.sleep( 2000 );
-        
+
         Thread t2 = new Thread( "T2: Cache remover" )
         {
             @Override
@@ -194,10 +179,10 @@ public class TestGcrCacheRemoveSizeDiverge
         };
         t2.start();
         t2.join();
-        
+
         resumeUpdateSize();
         t1.join();
-        
+
         assertEquals( "Invalid cache size for " + nodeCache, 0, nodeCache.size() );
     }
 

@@ -557,14 +557,9 @@ public class TestBatchInsert
 
     private Node getNodeInTx( long nodeId, GraphDatabaseService db )
     {
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             return db.getNodeById( nodeId );
-        }
-        finally
-        {
-            transaction.finish();
         }
     }
 

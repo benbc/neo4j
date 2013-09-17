@@ -74,14 +74,9 @@ public class TestCacheBeans
     public void canMeasureSizeOfCache() throws Exception
     {
         long[] before = get( CacheBean.NUMBER_OF_CACHED_ELEMENTS );
-        Transaction transaction = graphDb.beginTx();
-        try
+        try ( Transaction ignored = graphDb.beginTx() )
         {
             graphDb.getReferenceNode();
-        }
-        finally
-        {
-            transaction.finish();
         }
         assertChanged( "cache size not updated", before, get( CacheBean.NUMBER_OF_CACHED_ELEMENTS ) );
     }
@@ -90,15 +85,10 @@ public class TestCacheBeans
     public void canMeasureAmountsOfHitsAndMisses() throws Exception
     {
         long[] hits = get( CacheBean.HIT_COUNT ), miss = get( CacheBean.MISS_COUNT );
-        Transaction transaction = graphDb.beginTx();
-        try
+        try ( Transaction ignored = graphDb.beginTx() )
         {
             graphDb.getReferenceNode();
             graphDb.getReferenceNode();
-        }
-        finally
-        {
-            transaction.finish();
         }
         assertChanged( "hit count not updated", hits, get( CacheBean.HIT_COUNT ) );
         assertChanged( "miss count not updated", miss, get( CacheBean.MISS_COUNT ) );

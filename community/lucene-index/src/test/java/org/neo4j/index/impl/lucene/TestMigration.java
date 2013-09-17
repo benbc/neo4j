@@ -60,8 +60,7 @@ public class TestMigration
         InputStream stream = getClass().getClassLoader().getResourceAsStream( "old-index.db" );
         writeFile( stream, new File( path, "index.db" ) );
         db = new GraphDatabaseFactory().newEmbeddedDatabase( path );
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             assertTrue( db.index().existsForNodes( "indexOne" ) );
             Index<Node> indexOne = db.index().forNodes( "indexOne" );
@@ -72,10 +71,6 @@ public class TestMigration
             assertTrue( db.index().existsForRelationships( "indexThree" ) );
             Index<Relationship> indexThree = db.index().forRelationships( "indexThree" );
             verifyConfiguration( db, indexThree, LuceneIndexImplementation.EXACT_CONFIG );
-        }
-        finally
-        {
-            transaction.finish();
         }
         db.shutdown();
     }
@@ -145,8 +140,7 @@ public class TestMigration
         File storeDir = new File( "target/var/index" );
         Neo4jTestCase.deleteFileOrDirectory( storeDir );
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( storeDir.getPath() );
-        Transaction transaction = graphDb.beginTx();
-        try
+        try ( Transaction transaction = graphDb.beginTx() )
         {
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forNodes( "default" ) ) );
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forNodes( "wo-provider", MapUtil.stringMap( "type", "exact" ) ) ) );
@@ -156,16 +150,11 @@ public class TestMigration
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "w-provider", MapUtil.stringMap( "type", "exact", IndexManager.PROVIDER, "lucene" ) ) ) );
             transaction.success();
         }
-        finally
-        {
-            transaction.finish();
-        }
         graphDb.shutdown();
 
         removeProvidersFromIndexDbFile( storeDir );
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( storeDir.getPath() );
-        transaction = graphDb.beginTx();
-        try
+        try ( Transaction transaction = graphDb.beginTx() )
         {
             // Getting the index w/o exception means that the provider has been reinstated
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forNodes( "default" ) ) );
@@ -176,16 +165,11 @@ public class TestMigration
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "wo-provider", MapUtil.stringMap( "type", "exact" ) ) ) );
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "w-provider", MapUtil.stringMap( "type", "exact", IndexManager.PROVIDER, "lucene" ) ) ) );
         }
-        finally
-        {
-            transaction.finish();
-        }
         graphDb.shutdown();
 
         removeProvidersFromIndexDbFile( storeDir );
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( storeDir.getPath() );
-        transaction = graphDb.beginTx();
-        try
+        try ( Transaction transaction = graphDb.beginTx() )
         {
             // Getting the index w/o exception means that the provider has been reinstated
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forNodes( "default" ) ) );
@@ -194,10 +178,6 @@ public class TestMigration
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "default" ) ) );
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "wo-provider" ) ) );
             assertEquals( correctConfig, graphDb.index().getConfiguration( graphDb.index().forRelationships( "w-provider" ) ) );
-        }
-        finally
-        {
-            transaction.finish();
         }
         graphDb.shutdown();
     }

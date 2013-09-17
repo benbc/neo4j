@@ -65,8 +65,7 @@ public class TestLockManagerBean
     @Test
     public void modifiedNodeImpliesLock()
     {
-        Transaction tx = graphDb.beginTx();
-        try
+        try ( Transaction ignored = graphDb.beginTx() )
         {
             graphDb.getReferenceNode().setProperty( "key", "value" );
 
@@ -79,7 +78,7 @@ public class TestLockManagerBean
             LockingTransaction txInfo = transactions.iterator().next();
             assertNotNull( "null transaction", txInfo );
             assertEquals( "read count", 0, txInfo.getReadCount() );
-            
+
             /* Before property handling moved from Primitive into the Kernel API there were two
              * locks acquired for setting a property. One was about acquiring a write lock for that entity
              * before even accessing the Primitive. The other one was the normal write lock for a change
@@ -94,10 +93,6 @@ public class TestLockManagerBean
 
             assertEquals( "waiting thread count", 0, lock.getWaitingThreadsCount() );
         }
-        finally
-        {
-            tx.finish();
-        }
         List<LockInfo> locks = lockManager.getLocks();
         assertEquals( "unexpected lock count", 0, locks.size() );
     }
@@ -105,8 +100,7 @@ public class TestLockManagerBean
     @Test
     public void explicitLocksAffectTheLockCount()
     {
-        Transaction tx = graphDb.beginTx();
-        try
+        try ( Transaction tx = graphDb.beginTx() )
         {
             Node root = graphDb.getReferenceNode();
             Lock first = tx.acquireReadLock( root );
@@ -130,10 +124,6 @@ public class TestLockManagerBean
             assertEquals( "read count", 1, lock.getReadCount() );
             assertEquals( "write count", 1, lock.getWriteCount() );
         }
-        finally
-        {
-            tx.finish();
-        }
         List<LockInfo> locks = lockManager.getLocks();
         assertEquals( "unexpected lock count", 0, locks.size() );
     }
@@ -141,8 +131,7 @@ public class TestLockManagerBean
     @Test
     public void canGetToContendedLocksOnly() throws Exception
     {
-        Transaction tx = graphDb.beginTx();
-        try
+        try ( Transaction tx = graphDb.beginTx() )
         {
             final Node root = graphDb.getReferenceNode();
             graphDb.createNode();
@@ -231,10 +220,6 @@ public class TestLockManagerBean
 
             lock.release();
             latch.await();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

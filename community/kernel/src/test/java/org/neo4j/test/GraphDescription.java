@@ -223,8 +223,7 @@ public class GraphDescription implements GraphDefinition
     public Map<String, Node> create( GraphDatabaseService graphdb )
     {
         Map<String, Node> result = new HashMap<String, Node>();
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             graphdb.index().getRelationshipAutoIndexer().setEnabled( autoIndexRelationships );
             for ( NODE def : nodes )
@@ -243,10 +242,6 @@ public class GraphDescription implements GraphDefinition
                         def.properties(), graphdb.index().getRelationshipAutoIndexer(), autoIndexRelationships );
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
         return result;
     }
@@ -310,8 +305,7 @@ public class GraphDescription implements GraphDefinition
     {
         if ( nodes.isEmpty() ) return;
         GraphDatabaseService db = nodes.values().iterator().next().getGraphDatabase();
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             for ( Node node : GlobalGraphOperations.at( db ).getAllNodes() )
             {
@@ -320,10 +314,6 @@ public class GraphDescription implements GraphDefinition
                 node.delete();
             }
             tx.success();
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

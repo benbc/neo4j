@@ -54,22 +54,17 @@ public class JavaQuery
 
         // START SNIPPET: addData
         GraphDatabaseService db = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction tx = db.beginTx() )
         {
             Node myNode = db.createNode();
             myNode.setProperty( "name", "my node" );
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
         // END SNIPPET: addData
 
         // START SNIPPET: execute
         ExecutionEngine engine = new ExecutionEngine( db );
-        tx = db.beginTx();
+        Transaction tx = db.beginTx();
         ExecutionResult result = engine.execute( "start n=node(*) where n.name = 'my node' return n, n.name" );
         // END SNIPPET: execute
         // START SNIPPET: columns

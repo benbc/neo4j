@@ -298,13 +298,11 @@ public abstract class AbstractShellTest
 
     protected Relationship[] createRelationshipChain( RelationshipType type, int length )
     {
-        Transaction transaction = db.beginTx();
-        try {
+        try ( Transaction transaction = db.beginTx() )
+        {
             Relationship[] relationshipChain = createRelationshipChain( db.getReferenceNode(), type, length );
             transaction.success();
             return relationshipChain;
-        } finally {
-            transaction.finish();
         }
     }
 
@@ -344,13 +342,9 @@ public abstract class AbstractShellTest
     protected Node getCurrentNode() throws RemoteException, ShellException
     {
         Serializable current = shellServer.interpretVariable( shellClient.getId(), Variables.CURRENT_KEY );
-        Transaction transaction = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             return this.db.getNodeById( parseInt( current.toString().substring( 1 ) ) );
-        }
-        finally {
-            transaction.finish();
         }
     }
 }

@@ -54,8 +54,7 @@ public class Neo4jMatchers
             @Override
             protected boolean matches( Object item, Description mismatchDescription )
             {
-                Transaction tx = db.beginTx();
-                try
+                try ( Transaction ignored = db.beginTx() )
                 {
                     if ( inner.matches( item ) )
                     {
@@ -65,11 +64,6 @@ public class Neo4jMatchers
                     inner.describeMismatch( item, mismatchDescription );
 
                     return false;
-
-                }
-                finally
-                {
-                    tx.finish();
                 }
             }
 
@@ -464,14 +458,9 @@ public class Neo4jMatchers
 
         public Collection<T> collection()
         {
-            Transaction tx = db.beginTx();
-            try
+            try ( Transaction ignored = db.beginTx() )
             {
                 return asCollection( manifest() );
-            }
-            finally
-            {
-                tx.finish();
             }
         }
 

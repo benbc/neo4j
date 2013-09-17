@@ -70,16 +70,11 @@ public class LabelIT
 
     private long getLabelId( HighlyAvailableGraphDatabase db, Label label ) throws LabelNotFoundKernelException
     {
-        Transaction tx = db.beginTx();
-        try
+        try ( Transaction ignored = db.beginTx() )
         {
             ThreadToStatementContextBridge bridge = db.getDependencyResolver().resolveDependency(
                     ThreadToStatementContextBridge.class );
             return bridge.statement().readOperations().labelGetForName( label.name() );
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 

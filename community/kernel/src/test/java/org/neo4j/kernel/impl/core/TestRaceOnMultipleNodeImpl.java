@@ -272,33 +272,23 @@ public class TestRaceOnMultipleNodeImpl
 
     private void tx( Runnable task )
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             task.run();
 
             tx.success();
         }
-        finally
-        {
-            tx.finish();
-        }
     }
 
     private <R> R tx( Callable<R> task ) throws Exception
     {
-        Transaction tx = graphdb.beginTx();
-        try
+        try ( Transaction tx = graphdb.beginTx() )
         {
             R result = task.call();
 
             tx.success();
 
             return result;
-        }
-        finally
-        {
-            tx.finish();
         }
     }
 
