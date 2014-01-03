@@ -43,3 +43,4 @@ Licensing
 
 Neo4j is an open source product. We support a Community edition under the GPLv3 license. The Enterprise edition is available under the AGPLv3 license for open source projects otherwise under a commercial license from [Neo Technology](http://info.neotechnology.com/contactus.html).
 
+
