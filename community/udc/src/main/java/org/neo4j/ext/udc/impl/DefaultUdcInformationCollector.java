@@ -43,11 +43,12 @@ import static org.neo4j.ext.udc.UdcConstants.*;
 public class DefaultUdcInformationCollector implements UdcInformationCollector
 {
     private final Config config;
+    @SuppressWarnings("deprecation")
     private final KernelData kernel;
     private String storeId;
     private boolean crashPing;
 
-    public DefaultUdcInformationCollector( Config config, XaDataSourceManager xadsm, KernelData kernel )
+    public DefaultUdcInformationCollector( Config config, XaDataSourceManager xadsm, @SuppressWarnings("deprecation") KernelData kernel )
     {
         this.config = config;
         this.kernel = kernel;
@@ -86,7 +87,7 @@ public class DefaultUdcInformationCollector implements UdcInformationCollector
     {
         String classPath = getClassPath();
 
-        Map<String, String> udcFields = new HashMap<String, String>();
+        Map<String, String> udcFields = new HashMap<>();
 
         add( udcFields, ID, storeId );
         add( udcFields, VERSION,  filterVersionForUDC(kernel.version().getReleaseVersion() ));
@@ -96,7 +97,7 @@ public class DefaultUdcInformationCollector implements UdcInformationCollector
         add( udcFields, TAGS, determineTags( jarNamesForTags, classPath ) );
         add( udcFields, CLUSTER_HASH, determineClusterNameHash() );
         add( udcFields, SOURCE, config.get( UdcSettings.udc_source ) );
-        add( udcFields, REGISTRATION, config.<String>get( UdcSettings.udc_registration_key ) );
+        add( udcFields, REGISTRATION, config.get( UdcSettings.udc_registration_key ) );
         add( udcFields, MAC, determineMacAddress() );
         add( udcFields, DISTRIBUTION, determineOsDistribution() );
         add( udcFields, USER_AGENTS, determineUserAgents() );
@@ -232,17 +233,19 @@ public class DefaultUdcInformationCollector implements UdcInformationCollector
     {
         try
         {
-            Class<?> filter = Class.forName( "org.neo4j.server.rest.web.CollectUserAgentFilter" );
-            Object agents = filter.getMethod( "getUserAgents" ).invoke( null );
+            Class<?> filterClass = Class.forName( "org.neo4j.server.rest.web.CollectUserAgentFilter" );
+            Object filterInstance = filterClass.getMethod( "instance" ).invoke( null );
+
+            Object agents = filterClass.getMethod( "getUserAgents" ).invoke( filterInstance );
             String result = toCommaString( agents );
-            filter.getMethod( "reset" ).invoke( null );
+
+            filterClass.getMethod( "reset" ).invoke( filterInstance );
             return result;
         }
         catch ( Exception e )
         {
-            // ignore
+            return null;
         }
-        return null;
     }
 
     private String toCommaString( Object values )
@@ -300,7 +303,7 @@ public class DefaultUdcInformationCollector implements UdcInformationCollector
 
     private Map<String, String> determineSystemProperties()
     {
-        Map<String, String> relevantSysProps = new HashMap<String, String>();
+        Map<String, String> relevantSysProps = new HashMap<>();
         Properties sysProps = System.getProperties();
         Enumeration sysPropsNames = sysProps.propertyNames();
         while ( sysPropsNames.hasMoreElements() )
