@@ -1,0 +1,9 @@
+brew tap homebrew/dupes
+brew install make
+brew link --force make # maybe a problem, but what else? manually create gmake link?
+brew install ant
+
+
+
+http://dailycs.blogspot.co.uk/2011/06/junit-xml-output-without-ant.html
+
