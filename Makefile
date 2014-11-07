@@ -47,7 +47,7 @@ $(test-jar1): tmp/$(path1)/test-classpath tmp/$(path1)/classpath $(main-jar1) $(
 	jar cf $@ -C tmp/$(path1)/test-classes .
 
 out/$(module1)-tests-pass: $(test-jar1) $(jar) tmp/$(path1)/classpath tmp/$(path1)/test-classpath | out
-	java -classpath $$(cat tmp/$(path1)/classpath):$$(cat tmp/$(path1)/test-classpath):$(main-jar1):$(test-jar1) \
+	java -enableassertions -classpath $$(cat tmp/$(path1)/classpath):$$(cat tmp/$(path1)/test-classpath):$(main-jar1):$(test-jar1) \
 		org.junit.runner.JUnitCore \
 		$(call extract-tests,$(test-jar1))
 
@@ -80,7 +80,7 @@ $(test-jar2): tmp/$(path2)/test-classpath tmp/$(path2)/classpath $(main-jar2) $(
 	jar cf $@ -C tmp/$(path2)/test-classes .
 
 out/$(module2)-tests-pass: $(test-jar2) $(jar) tmp/$(path2)/classpath tmp/$(path2)/test-classpath $(main-jar1) | out
-	java -classpath $$(cat tmp/$(path2)/classpath):$$(cat tmp/$(path2)/test-classpath):$(main-jar2):$(test-jar2):$(main-jar1) \
+	java -enableassertions -classpath $$(cat tmp/$(path2)/classpath):$$(cat tmp/$(path2)/test-classpath):$(main-jar2):$(test-jar2):$(main-jar1) \
 		org.junit.runner.JUnitCore \
 		$(call extract-tests,$(test-jar2))
 
