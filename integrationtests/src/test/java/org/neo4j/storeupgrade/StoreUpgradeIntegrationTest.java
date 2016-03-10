@@ -19,12 +19,6 @@
  */
 package org.neo4j.storeupgrade;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,6 +29,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.neo4j.dbms.DatabaseManagementSystemSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -67,12 +67,10 @@ import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.neo4j.register.Register.DoubleLongRegister;
 import org.neo4j.register.Registers;
-import org.neo4j.server.Bootstrapper;
+import org.neo4j.server.BaseBootstrapper;
 import org.neo4j.server.CommunityBootstrapper;
-import org.neo4j.server.NeoServer;
 import org.neo4j.server.ServerTestUtils;
 import org.neo4j.server.configuration.ServerSettings;
-import org.neo4j.server.database.Database;
 import org.neo4j.test.SuppressOutput;
 import org.neo4j.test.TargetDirectory;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -83,6 +81,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import static org.neo4j.consistency.store.StoreAssertions.assertConsistentStore;
 import static org.neo4j.helpers.collection.Iterables.count;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
@@ -209,14 +208,12 @@ public class StoreUpgradeIntegrationTest
 
             try
             {
-                Bootstrapper bootstrapper = new CommunityBootstrapper();
-                bootstrapper.start( configFile );
+                BaseBootstrapper bootstrapper = new CommunityBootstrapper();
                 try
                 {
-                    NeoServer server = bootstrapper.getServer();
-                    Database database = server.getDatabase();
-                    assertTrue( database.isRunning() );
-                    checkInstance( store, database.getGraph() );
+                    bootstrapper.start( configFile );
+                    assertTrue( bootstrapper.isRunning() );
+                    checkInstance( store, bootstrapper.getServer().getDatabase().getGraph() );
                 }
                 finally
                 {

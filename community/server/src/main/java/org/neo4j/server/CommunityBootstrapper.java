@@ -31,17 +31,29 @@ import org.neo4j.server.configuration.ServerSettings;
 
 import static java.util.Arrays.asList;
 
-public class CommunityBootstrapper extends Bootstrapper
+public class CommunityBootstrapper extends BaseBootstrapper
 {
     public static final List<Class<?>> settingsClasses =
             asList( ServerSettings.class, GraphDatabaseSettings.class, DatabaseManagementSystemSettings.class );
 
     public static void main( String[] args )
     {
-        int exit = start( new CommunityBootstrapper(), args );
-        if ( exit != 0 )
+        System.exit( start( new CommunityBootstrapper(), args ) );
+    }
+
+    private static BlockingBootstrapper bootstrapper;
+
+    public static void start( String[] args )
+    {
+        bootstrapper = new BlockingBootstrapper( new CommunityBootstrapper() );
+        System.exit( start( bootstrapper, args ) );
+    }
+
+    public static void stop( @SuppressWarnings("UnusedParameters") String[] args )
+    {
+        if ( bootstrapper != null )
         {
-            System.exit( exit );
+            bootstrapper.stop();
         }
     }
 
@@ -57,4 +69,5 @@ public class CommunityBootstrapper extends Bootstrapper
     {
         return settingsClasses;
     }
+
 }
