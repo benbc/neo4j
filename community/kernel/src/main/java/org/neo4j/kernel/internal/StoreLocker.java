@@ -78,6 +78,17 @@ public class StoreLocker
         }
         catch ( OverlappingFileLockException | IOException e )
         {
+            if ( storeLockFileChannel != null )
+            {
+                try
+                {
+                    storeLockFileChannel.close();
+                }
+                catch ( IOException e1 )
+                {
+                    e.addSuppressed( e1 );
+                }
+            }
             String message = "Unable to obtain lock on store lock file: " + storeLockFile;
             throw storeLockException( message, e );
         }
@@ -86,7 +97,7 @@ public class StoreLocker
     private StoreLockException storeLockException( String message, Exception e )
     {
         String help = "Please ensure no other process is using this database, and that the directory is writable " +
-                      "(required even for read-only access)";
+                "(required even for read-only access)";
         return new StoreLockException( message + ". " + help, e );
     }
 

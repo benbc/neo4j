@@ -19,12 +19,14 @@
  */
 package org.neo4j.kernel.internal;
 
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Rule;
+import org.junit.Test;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -38,10 +40,13 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.test.rule.TestDirectory;
 
 import static java.lang.String.format;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
+
 import static org.neo4j.kernel.internal.StoreLocker.STORE_LOCK_FILENAME;
 
 public class StoreLockerTest
@@ -214,6 +219,40 @@ public class StoreLockerTest
         {
             storeLocker.release();
         }
+    }
+
+    @Test
+    public void shouldNotLeaveFileHandlesOpenWhenFailingToLockFile() throws IOException
+    {
+        assumeTrue( "There does not seem to be any way to test this on Linux", SystemUtils.IS_OS_WINDOWS );
+
+        FileSystemAbstraction fs = new DefaultFileSystemAbstraction();
+        File directory = target.directory( "a-dir" );
+        StoreLocker successfulLocker = new StoreLocker( fs );
+        StoreLocker unsuccessfulLocker = new StoreLocker( fs );
+
+        successfulLocker.checkLock( directory );
+
+        try
+        {
+            unsuccessfulLocker.checkLock( directory );
+            fail( "expected exception" );
+        }
+        catch ( StoreLockException e )
+        {
+            // expected
+        }
+        finally
+        {
+            successfulLocker.release();
+        }
+
+        // If the second (failing) attempt to lock the directory has cleaned up after itself correctly then there are
+        // no open file handles to the lock file and it can be deleted. If the file handle has not been closed then the
+        // deletion will fail on Windows.
+        Files.delete( directory.toPath().resolve( StoreLocker.STORE_LOCK_FILENAME ) );
+
+        unsuccessfulLocker.release();
     }
 
     @Test
